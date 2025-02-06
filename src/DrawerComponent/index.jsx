@@ -54,7 +54,7 @@ export default function DrawerComponent({ image, setImage, setActions, Actions, 
     else {
       try {
         setbackDrop(true);
-        var response = await axios.post('http://localhost:5000/filter', { filter: filter, image: image });
+        var response = await axios.post('https://photoshop-sz.onrender.com/filter', { filter: filter, image: image });
         setImage(response.data['image']);
         setActions([...Actions, response.data['image']]);
         console.log('response data', response.data.image);

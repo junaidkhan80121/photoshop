@@ -10,8 +10,10 @@ from datetime import datetime
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app)
 CORS(app)
 
 limiter = Limiter(
@@ -28,7 +30,10 @@ MONGO_DB_URI = "mongodb+srv://khanjunaid80121:"+DB_PASS+"@cluster0.exfs3.mongodb
 @limiter.limit("10 per minute")
 def apply_filter():
     data = request.get_json()
-    client_ip = request.remote_addr
+    if 'X-Forwarded-For' in request.headers:
+        client_ip = request.headers.getlist('X-Forwarded-For')[0]
+    else:
+        client_ip = request.remote_addr
     if 'filter' not in data or 'image' not in data:
         collection.insert_one({
             "timestamp": datetime.now(),

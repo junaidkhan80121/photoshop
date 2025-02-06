@@ -28,7 +28,7 @@ This project is a web-based image editing application that allows users to apply
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/photoshop.git](https://www.google.com/search?q=https://github.com/YOUR_USERNAME/photoshop.git)  *(Replace with your repository URL)*
+   git clone https://github.com/YOUR_USERNAME/photoshop.git](https://www.google.com/search?q=https://github.com/YOUR_USERNAME/photoshop.git)  *(Replace with your repository URL)](https://github.com/junaidkhan80121/photoshop.git)*
 
 cd photoshop/frontend  *(Navigate to the frontend directory)*
 npm install  *(Install frontend dependencies)*

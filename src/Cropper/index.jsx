@@ -1,11 +1,12 @@
 import React, { useState, useRef } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import imageCompression from 'browser-image-compression';
 import { Slider, Box, Button, Typography, Backdrop, MenuItem, Select } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import DrawerComponent from "./DrawerComponent";
+import DrawerComponent from "../DrawerComponent";
 import ReplayIcon from '@mui/icons-material/Replay';
-import './image_Crop_Rotate.css';
+import './index.css';
 import { Mosaic } from 'react-loading-indicators';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -15,6 +16,7 @@ import RotateLeftIcon from '@mui/icons-material/RotateLeft';
 const ImageCropper = ({ darkMode }) => {
   const [image, setImage] = useState(null);
   const [rotation, setRotation] = useState(0);
+  const [compressionFactor, setCompressionFactor] = useState(0.8);
   const cropperRef = useRef(null); // Reference for the cropper instance
   const [Actions, setActions] = useState([]);
   const [backDrop, setbackDrop] = useState(false);
@@ -29,31 +31,48 @@ const ImageCropper = ({ darkMode }) => {
     }
   }
 
-  // Handle file input change
-  const handleImageChange = (e) => {
+  const compressImage = async (imageFile) => {
+    const options = {
+      maxSizeMB: compressionFactor,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true, 
+    };
+
+    try {
+      const compressedFile = await imageCompression(imageFile, options);
+      return compressedFile;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      return null;
+    }
+  };
+
+
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      const compressedFile = await compressImage(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         const originalImage = e.target.result;
         setImage(originalImage);
         setActions([originalImage]); // Add the original image to the Actions array
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };
-  
 
-  // Handle file upload via drag-and-drop
-  const handleDrop = (e) => {
+
+  const handleDrop = async (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
+      const compressedFile = await compressImage(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setImage(e.target.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };
 
@@ -61,17 +80,18 @@ const ImageCropper = ({ darkMode }) => {
     e.preventDefault();
   };
 
-  // Function to download the cropped image
-  const downloadCroppedImage = () => {
+
+  const downloadCroppedImage = async () => {
     const cropper = cropperRef.current?.cropper;
     if (cropper) {
       const canvas = cropper.getCroppedCanvas();
       if (canvas) {
         const croppedImageURL = canvas.toDataURL(`image/${format}`);
 
-        // Create a download link
+        const blob = await fetch(croppedImageURL).then(res => res.blob());
+        const compressedBlob = await compressImage(blob);
         const link = document.createElement("a");
-        link.href = croppedImageURL;
+        link.href = URL.createObjectURL(compressedBlob);
         link.download = `final_image.${format}`;
         link.click();
       }
@@ -86,7 +106,7 @@ const ImageCropper = ({ darkMode }) => {
     }
   };
 
-  // Handle slider change for custom rotation
+
   const handleSliderChange = (e, newValue) => {
     setRotation(newValue);
     const cropper = cropperRef.current?.cropper;
@@ -105,6 +125,8 @@ const ImageCropper = ({ darkMode }) => {
             setImage={setImage}
             setActions={setActions}
             Actions={Actions}
+            compressionFactor={compressionFactor}
+            setCompressionFactor={setCompressionFactor}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 10, lg: 10 }}>
@@ -146,7 +168,6 @@ const ImageCropper = ({ darkMode }) => {
                   responsive={true}
                   autoCropArea={0.8}
                   background={false}
-                  // brightness={100}
                   movable={true}
                   zoomable={true}
                   checkOrientation={false}
@@ -237,7 +258,6 @@ const ImageCropper = ({ darkMode }) => {
                   <Typography gutterBottom>Select Download Format:</Typography>
                   <Select
                     value={format}
-                    // size='small'
                     onChange={(e) => setFormat(e.target.value)}
                     size="small"
                     sx={{ marginBottom: "10px" }}

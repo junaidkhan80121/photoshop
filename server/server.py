@@ -4,7 +4,7 @@ import cv2
 import base64
 import numpy as np
 from pymongo import MongoClient
-
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -13,10 +13,17 @@ CORS(app)
 @app.route('/filter',methods=["POST","GET"])
 def apply_filter():
     data = request.get_json()
-    # client_ip = request.remote_addr
+    client_ip = request.remote_addr
     # print('Client IP is',client_ip)
     # data = request.args.get('filter')
     if 'filter' not in data or 'image' not in data:
+        collection.insert_one({
+            "timestamp": datetime.now(),
+            "status": "Error",
+            "client_ip": client_ip,
+            "filter_name":data["filter_name"],
+            "error_type": "Missing 'filter' or 'image' in request data"
+        })
         return jsonify({"message": "Missing 'filter' or 'image' in request data"}), 400
     try:
         clientIP = request.remote_addr
@@ -164,12 +171,27 @@ def apply_filter():
             processed_image = np.floor(image / (256 / levels)) * (256 / levels)
             processed_image = processed_image.astype(np.uint8)
             
-                
+        else:
+            # Log unsupported filter
+            collection.insert_one({
+                "timestamp": datetime.now(),
+                "status": "Error",
+                "client_ip": client_ip,
+                "filter_name": data["filter_name"],
+                "error_type": "Unsupported filter"
+            })
+            return jsonify({"message": "Unsupported filter"}), 400       
         
         _, buffer = cv2.imencode('.jpg', processed_image)
         processed_base64_image = base64.b64encode(buffer).decode('utf-8')
         
-        collection.insert_one({"Status":"Success","client_IP":clientIP,"filter_name":data['filter']})
+        #collection.insert_one({"Status":"Success","client_IP":clientIP,"filter_name":data['filter']})
+        collection.insert_one({
+            "timestamp": datetime.now(),
+            "status": "Success",
+            "client_ip": client_ip,
+            "filter_name": data["filter_name"]
+        })
 
         return jsonify({
             "message":"Processed Successfully",

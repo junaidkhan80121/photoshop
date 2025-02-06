@@ -1,9 +1,9 @@
 import "./App.css";
-import ImageCropRotate from "./image_Crop_Rotate";
 import { ThemeProvider } from "@emotion/react";
 import { createTheme } from "@mui/material";
 import { useCallback, useState } from "react";
 import NavBar from "./Navbar";
+import ImageCropper from "./Cropper";
 
 function App() {
   const checkThemeMode = useCallback(() => {
@@ -21,10 +21,12 @@ function App() {
   });
 
   return (
+    <>
     <ThemeProvider theme={theme}>
       <NavBar darkMode={darkMode} setdarkMode={setdarkMode} />
-      <ImageCropRotate darkMode={darkMode} />
+      <ImageCropper darkMode={darkMode} />
     </ThemeProvider>
+    </>
   );
 }
 

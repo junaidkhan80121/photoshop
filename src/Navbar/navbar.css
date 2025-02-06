@@ -6,3 +6,9 @@
     font-weight: 500;
     font-style: normal;
   }
+
+  .links{
+    text-decoration: none;
+    color: white;
+    margin: 0px 20px 0px 20px;
+  }

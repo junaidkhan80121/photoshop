@@ -1,34 +1,47 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cv2
+import os
 import base64
 import numpy as np
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 from datetime import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
 
+limiter = Limiter(
+    get_remote_address, 
+    app=app,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+load_dotenv()
+DB_PASS = os.getenv("DB_PASSKEY")
+MONGO_DB_URI = "mongodb+srv://khanjunaid80121:"+DB_PASS+"@cluster0.exfs3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 @app.route('/filter',methods=["POST","GET"])
+@limiter.limit("10 per minute")
 def apply_filter():
     data = request.get_json()
     client_ip = request.remote_addr
-    # print('Client IP is',client_ip)
-    # data = request.args.get('filter')
     if 'filter' not in data or 'image' not in data:
         collection.insert_one({
             "timestamp": datetime.now(),
             "status": "Error",
             "client_ip": client_ip,
-            "filter_name":data["filter_name"],
+            "filter_name":data["filter"],
             "error_type": "Missing 'filter' or 'image' in request data"
         })
         return jsonify({"message": "Missing 'filter' or 'image' in request data"}), 400
     try:
         clientIP = request.remote_addr
-        client = MongoClient('mongodb://localhost:27017')
-        db = client['photoshop']
+        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
+        db = client['Photoshop']
         collection = db['logs']
         base64_image = data['image']
         image_data = base64.b64decode(base64_image.split(',')[1])
@@ -177,7 +190,7 @@ def apply_filter():
                 "timestamp": datetime.now(),
                 "status": "Error",
                 "client_ip": client_ip,
-                "filter_name": data["filter_name"],
+                "filter_name": data["filter"],
                 "error_type": "Unsupported filter"
             })
             return jsonify({"message": "Unsupported filter"}), 400       
@@ -190,7 +203,7 @@ def apply_filter():
             "timestamp": datetime.now(),
             "status": "Success",
             "client_ip": client_ip,
-            "filter_name": data["filter_name"]
+            "filter_name": data["filter"]
         })
 
         return jsonify({
@@ -201,9 +214,9 @@ def apply_filter():
         
     except Exception as e:
         print('Error:',e)
-        collection.insert_one({"Status":"Error","errorType":str(e),"client_IP":clientIP,"filter_name":data['filter']})
+        collection.insert_one({"Status":"Error","errorType":str(e),"client_IP":clientIP,"filter":data['filter']})
         return jsonify({"message":"Error in processing image"}), 500
     
 
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(debug=False)

@@ -5,3 +5,4 @@ pymongo
 python-dotenv
 werkzeug
 gunicorn
+flask-limiter

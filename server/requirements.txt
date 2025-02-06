@@ -4,3 +4,4 @@ opencv-python
 pymongo
 python-dotenv
 werkzeug
+gunicorn

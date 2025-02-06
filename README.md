@@ -1,70 +1,40 @@
-# Getting Started with Create React App
+# Photoshop - Image Editing Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a web-based image editing application that allows users to apply various filters, perform rotations, cropping, and other image manipulations.  The application utilizes a ReactJS frontend for user interaction and a Flask backend with OpenCV (cv2) for image processing.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+* **Frontend (ReactJS):**
+    * Image upload and preview.
+    * Interactive cropping and rotation tools.
+    * Real-time preview of cropping and rotation changes.
+    * Compression functionality.
+    * User interface for selecting and applying filters.
+    * Display of processed images.
+* **Backend (Flask & OpenCV):**
+    * Image processing using OpenCV (cv2).
+    * Implementation of various image filters (e.g., grayscale, blur, edge detection, etc.).  *(List specific filters implemented here)*
+    * Handling image compression requests.
+    * Serving processed images to the frontend.
 
-### `npm start`
+## Technologies Used
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* **Frontend:** ReactJS
+* **Backend:** Flask (Python)
+* **Image Processing:** OpenCV (cv2)
+* **Other:** *(Mention any other libraries or technologies used, e.g., specific UI libraries, state management tools, etc.)*
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUR_USERNAME/photoshop.git](https://www.google.com/search?q=https://github.com/YOUR_USERNAME/photoshop.git)  *(Replace with your repository URL)*
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+cd photoshop/frontend  *(Navigate to the frontend directory)*
+npm install  *(Install frontend dependencies)*
+npm start  *(Start the frontend development server)*
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+cd photoshop/backend  *(Navigate to the backend directory)*
+pip install -r requirements.txt *(Install backend dependencies - Create a requirements.txt file listing Flask, OpenCV, and other Python packages)*
+python app.py  *(Start the Flask backend server)*

@@ -2,4 +2,4 @@ flask
 flask_cors
 opencv-python
 pymongo
-dotenv
+python-dotenv

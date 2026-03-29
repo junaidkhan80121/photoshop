@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   Box,
   Tabs,
@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import {
   Close as CloseIcon,
+  Undo as UndoIcon,
+  Redo as RedoIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import Histogram from './Histogram';
@@ -27,7 +29,7 @@ const filters = [
   { title: 'Sepia', filter: 'sepia', image: './filter_preview/sepia.png' },
   { title: 'Glow', filter: 'glow', image: './filter_preview/glow.png' },
   { title: 'Pencil Sketch', filter: 'pencil_sketch', image: './filter_preview/pencil_sketch.png' },
-  { title: 'Oil Painting', filter: 'oil_paintintg', image: './filter_preview/oil_painting.png' },
+  { title: 'Oil Painting', filter: 'oil_painting', image: './filter_preview/oil_painting.png' },
   { title: 'Solarize', filter: 'solarize', image: './filter_preview/solarize.png' },
   { title: 'Pixelate', filter: 'pixelate', image: './filter_preview/pixelate.png' },
   { title: 'Canny', filter: 'canny', image: './filter_preview/canny.png' },
@@ -37,11 +39,14 @@ const filters = [
 ];
 
 const presets = [
-  { id: 'cine_dark', name: 'CINE_DARK' },
-  { id: 'vibe_800', name: 'VIBE_800' },
-  { id: 'matte_wb', name: 'MATTE_W_B' },
-  { id: 'pro_mist', name: 'PRO_MIST' },
+  { id: 'cine_dark', name: 'CINE_DARK', filters: { contrast: 20, shadows: 30 } },
+  { id: 'vibe_800', name: 'VIBE_800', filters: { exposure: 10, highlights: -20, shadows: 20 } },
+  { id: 'matte_wb', name: 'MATTE_W_B', filters: { contrast: -15, highlights: -10 } },
+  { id: 'pro_mist', name: 'PRO_MIST', filters: { exposure: 15, highlights: -30 } },
 ];
+
+// API base URL - update this to your backend URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function RightPanel({
   darkMode,
@@ -55,47 +60,125 @@ export default function RightPanel({
   setBackDrop,
   compressionFactor,
   setCompressionFactor,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
 }) {
   const [snackBar, setSnackBar] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
   const [localAdjustments, setLocalAdjustments] = useState({
-    exposure: 0.45,
-    contrast: -12,
+    exposure: 0,
+    contrast: 0,
     highlights: 0,
-    shadows: 24,
+    shadows: 0,
   });
+  const debounceTimer = useRef(null);
 
   const handleTabChange = (event, newValue) => {
     setActivePanel(newValue);
   };
 
+  const showError = (message) => {
+    setSnackBarMessage(message);
+    setSnackBar(true);
+  };
+
+  const applyAdjustments = useCallback(async (adjustments) => {
+    if (!image) {
+      showError('Please upload an image first');
+      return;
+    }
+
+    try {
+      setBackDrop(true);
+      const response = await axios.post(`${API_URL}/adjust`, {
+        image: image,
+        ...adjustments
+      });
+      
+      if (response.data && response.data.image) {
+        setImage(response.data.image);
+        setActions(prev => [...prev, response.data.image]);
+      }
+      setBackDrop(false);
+    } catch (e) {
+      console.error('Error applying adjustments:', e);
+      showError('Error applying adjustments');
+      setBackDrop(false);
+    }
+  }, [image, setImage, setActions, setBackDrop]);
+
   const handleAdjustmentChange = (key, value) => {
     setLocalAdjustments(prev => ({ ...prev, [key]: value }));
     setAdjustments(key, value);
+    
+    // Debounce the API call
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    debounceTimer.current = setTimeout(() => {
+      const newAdjustments = { ...localAdjustments, [key]: value };
+      applyAdjustments(newAdjustments);
+    }, 300);
   };
 
   const getFilter = async (filter) => {
     if (!image) {
-      setSnackBar(true);
+      showError('Please upload an image first');
       return;
     }
     try {
       setBackDrop(true);
-      const response = await axios.post('https://photoshop-sz.onrender.com/filter', {
+      const response = await axios.post(`${API_URL}/filter`, {
         filter: filter,
         image: image,
       });
-      setImage(response.data['image']);
-      setActions([...Actions, response.data['image']]);
+      
+      if (response.data && response.data.image) {
+        setImage(response.data.image);
+        setActions(prev => [...prev, response.data.image]);
+      }
       setBackDrop(false);
     } catch (e) {
-      setSnackBar(true);
+      console.error('Error applying filter:', e);
+      showError('Error processing image');
       setBackDrop(false);
     }
+  };
+
+  const applyPreset = async (preset) => {
+    if (!image) {
+      showError('Please upload an image first');
+      return;
+    }
+    
+    const newAdjustments = { ...localAdjustments, ...preset.filters };
+    setLocalAdjustments(newAdjustments);
+    await applyAdjustments(newAdjustments);
   };
 
   const formatValue = (value) => {
     if (value > 0) return `+${value}`;
     return value;
+  };
+
+  const resetAdjustments = () => {
+    setLocalAdjustments({
+      exposure: 0,
+      contrast: 0,
+      highlights: 0,
+      shadows: 0,
+    });
+    if (image) {
+      applyAdjustments({
+        exposure: 0,
+        contrast: 0,
+        highlights: 0,
+        shadows: 0,
+      });
+    }
   };
 
   return (
@@ -115,7 +198,7 @@ export default function RightPanel({
             </IconButton>
           }
         >
-          Error processing image
+          {snackBarMessage}
         </Alert>
       </Snackbar>
 
@@ -149,6 +232,35 @@ export default function RightPanel({
             <Typography className="info-text">72 DPI</Typography>
             <Box className="info-divider" />
             <Typography className="info-text">16-BIT PRO-PHOTO RGB</Typography>
+          </Box>
+
+          {/* Undo/Redo Buttons */}
+          <Box className="history-controls">
+            <Button
+              className="history-button"
+              startIcon={<UndoIcon />}
+              onClick={onUndo}
+              disabled={!canUndo}
+              size="small"
+            >
+              Undo
+            </Button>
+            <Button
+              className="history-button"
+              startIcon={<RedoIcon />}
+              onClick={onRedo}
+              disabled={!canRedo}
+              size="small"
+            >
+              Redo
+            </Button>
+            <Button
+              className="reset-button"
+              onClick={resetAdjustments}
+              size="small"
+            >
+              Reset
+            </Button>
           </Box>
 
           {/* Exposure & Color Section */}
@@ -222,6 +334,7 @@ export default function RightPanel({
                 key={preset.id}
                 className="preset-button"
                 variant="outlined"
+                onClick={() => applyPreset(preset)}
               >
                 {preset.name}
               </Button>
@@ -239,6 +352,21 @@ export default function RightPanel({
               >
                 <img src={filter.image} alt={filter.title} className="filter-thumb" />
                 <Typography className="filter-name">{filter.title}</Typography>
+              </Box>
+            ))}
+          </Box>
+
+          {/* All Filters */}
+          <Typography className="section-title">ALL FILTERS</Typography>
+          <Box className="filters-grid">
+            {filters.map((filter, index) => (
+              <Box
+                key={index}
+                className="filter-grid-item"
+                onClick={() => getFilter(filter.filter)}
+              >
+                <img src={filter.image} alt={filter.title} className="filter-grid-thumb" />
+                <Typography className="filter-grid-name">{filter.title}</Typography>
               </Box>
             ))}
           </Box>
@@ -266,14 +394,38 @@ export default function RightPanel({
       {/* Layers Panel */}
       {activePanel === 'layers' && (
         <Box className="panel-content">
-          <Typography className="empty-state">No layers yet</Typography>
+          {image ? (
+            <Box className="layers-list">
+              <Box className="layer-item active">
+                <Box className="layer-thumbnail">
+                  <img src={image} alt="Base" />
+                </Box>
+                <Typography className="layer-name">Background</Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Typography className="empty-state">No image loaded</Typography>
+          )}
         </Box>
       )}
 
       {/* History Panel */}
       {activePanel === 'history' && (
         <Box className="panel-content">
-          <Typography className="empty-state">History is empty</Typography>
+          {Actions.length > 0 ? (
+            <Box className="history-list">
+              {Actions.map((action, index) => (
+                <Box 
+                  key={index} 
+                  className={`history-item ${index === Actions.length - 1 ? 'active' : ''}`}
+                >
+                  <Typography className="history-step">Step {index + 1}</Typography>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography className="empty-state">History is empty</Typography>
+          )}
         </Box>
       )}
     </Box>

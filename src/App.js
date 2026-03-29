@@ -11,17 +11,18 @@ import ImageCanvas from "./ImageCanvas";
 function App() {
   const [activeTool, setActiveTool] = useState("select");
   const [image, setImage] = useState(null);
-  const [actions, setActions] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [backDrop, setBackDrop] = useState(false);
   const [compressionFactor, setCompressionFactor] = useState(0.8);
   const [activePanel, setActivePanel] = useState("adjust");
   
   // Adjustment values
   const [adjustments, setAdjustments] = useState({
-    exposure: 0.45,
-    contrast: -12,
+    exposure: 0,
+    contrast: 0,
     highlights: 0,
-    shadows: 24,
+    shadows: 0,
   });
 
   const checkThemeMode = useCallback(() => {
@@ -34,6 +35,48 @@ function App() {
   }, []);
 
   const [darkMode, setDarkMode] = useState(checkThemeMode());
+
+  // Add image to history
+  const addToHistory = useCallback((newImage) => {
+    setHistory(prev => {
+      // Remove any future history if we're not at the end
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newImage);
+      // Keep only last 20 items
+      if (newHistory.length > 20) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 19));
+  }, [historyIndex]);
+
+  // Undo functionality
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setImage(history[newIndex]);
+    }
+  }, [history, historyIndex]);
+
+  // Redo functionality
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setImage(history[newIndex]);
+    }
+  }, [history, historyIndex]);
+
+  // Set image with history tracking
+  const handleSetImage = useCallback((newImage) => {
+    if (newImage && history.length === 0) {
+      setHistory([newImage]);
+      setHistoryIndex(0);
+    }
+    setImage(newImage);
+  }, [history.length]);
 
   const theme = createTheme({
     palette: {
@@ -100,7 +143,7 @@ function App() {
           darkMode={darkMode} 
           setDarkMode={setDarkMode}
           image={image}
-          setImage={setImage}
+          setImage={handleSetImage}
         />
         <div className="main-layout">
           <LeftToolbar 
@@ -111,9 +154,9 @@ function App() {
           <div className="canvas-area">
             <ImageCanvas 
               image={image}
-              setImage={setImage}
-              setActions={setActions}
-              Actions={actions}
+              setImage={handleSetImage}
+              setActions={addToHistory}
+              Actions={history}
               setBackDrop={setBackDrop}
               backDrop={backDrop}
               activeTool={activeTool}
@@ -131,12 +174,16 @@ function App() {
             adjustments={adjustments}
             setAdjustments={handleAdjustmentChange}
             image={image}
-            setImage={setImage}
-            setActions={setActions}
-            Actions={actions}
+            setImage={handleSetImage}
+            setActions={addToHistory}
+            Actions={history}
             setBackDrop={setBackDrop}
             compressionFactor={compressionFactor}
             setCompressionFactor={setCompressionFactor}
+            canUndo={historyIndex > 0}
+            canRedo={historyIndex < history.length - 1}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
           />
         </div>
       </div>

@@ -36,9 +36,6 @@ Edit `.env` with your settings:
 # For local MongoDB without authentication (default):
 MONGO_URI=mongodb://localhost:27017/
 
-# For local MongoDB with authentication:
-# MONGO_URI=mongodb://username:password@localhost:27017/photoshop?authSource=admin
-
 # Database Configuration
 MONGO_DB_NAME=Photoshop
 MONGO_COLLECTION_NAME=logs
@@ -71,9 +68,9 @@ Server will start on `http://localhost:5000`
 To use MongoDB Atlas instead of local MongoDB:
 
 1. Get your Atlas connection string from MongoDB Atlas dashboard
-2. Update `.env`:
+2. Update `.env` with your Atlas URI:
    ```env
-   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/photoshop?retryWrites=true&w=majority
+   MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/photoshop?retryWrites=true&w=majority
    ```
 
 ## API Endpoints

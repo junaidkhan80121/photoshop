@@ -1,6 +1,7 @@
 import React from 'react';
-import { Tooltip, IconButton, Box } from '@mui/material';
+import { Tooltip, IconButton, Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
 import {
+  ChevronLeft as CloseIcon,
   AdsClick as SelectIcon,
   Crop as CropIcon,
   Brush as BrushIcon,
@@ -30,9 +31,28 @@ const bottomTools = [
   { id: 'help', name: 'Help', icon: HelpIcon },
 ];
 
-export default function LeftToolbar({ activeTool, setActiveTool, darkMode }) {
-  return (
-    <Box className={`left-toolbar ${darkMode ? 'dark' : 'light'}`}>
+export default function LeftToolbar({ activeTool, setActiveTool, darkMode, isOpen, onClose }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleToolClick = (toolId) => {
+    setActiveTool(toolId);
+    if (isMobile && onClose) {
+      onClose();
+    }
+  };
+
+  const toolbarContent = (
+    <>
+      {isMobile && (
+        <Box className="mobile-toolbar-header">
+          <span className="mobile-toolbar-title">Tools</span>
+          <IconButton onClick={onClose} size="small" className="mobile-close-btn">
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      )}
+      
       <Box className="toolbar-top">
         {tools.map((tool) => {
           const IconComponent = tool.icon;
@@ -42,12 +62,12 @@ export default function LeftToolbar({ activeTool, setActiveTool, darkMode }) {
             <Tooltip
               key={tool.id}
               title={`${tool.name} (${tool.shortcut})`}
-              placement="right"
+              placement={isMobile ? "right" : "right"}
               arrow
             >
               <IconButton
                 className={`toolbar-button ${isActive ? 'active' : ''}`}
-                onClick={() => setActiveTool(tool.id)}
+                onClick={() => handleToolClick(tool.id)}
                 size="small"
               >
                 <IconComponent className="toolbar-icon" />
@@ -79,6 +99,30 @@ export default function LeftToolbar({ activeTool, setActiveTool, darkMode }) {
           );
         })}
       </Box>
+    </>
+  );
+
+  // Mobile drawer version
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="left"
+        open={isOpen}
+        onClose={onClose}
+        className="left-toolbar-drawer"
+        PaperProps={{
+          className: `left-toolbar mobile ${darkMode ? 'dark' : 'light'}`
+        }}
+      >
+        {toolbarContent}
+      </Drawer>
+    );
+  }
+
+  // Desktop version
+  return (
+    <Box className={`left-toolbar ${darkMode ? 'dark' : 'light'}`}>
+      {toolbarContent}
     </Box>
   );
 }

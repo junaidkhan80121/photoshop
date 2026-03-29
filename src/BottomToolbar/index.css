@@ -8,6 +8,13 @@
   align-items: center;
   padding: 0 24px;
   gap: 20px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.bottom-toolbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .bottom-toolbar.light {
@@ -20,6 +27,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 60px;
+  flex-shrink: 0;
 }
 
 .section-header {
@@ -58,6 +66,7 @@
 
 .slider-container {
   width: 120px;
+  flex-shrink: 0;
 }
 
 .slider-container.small {
@@ -85,6 +94,7 @@
   width: 1px;
   height: 40px;
   background-color: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
 .light .toolbar-divider {
@@ -96,6 +106,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .color-swatch {
@@ -129,6 +140,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 120px;
 }
 
 .placeholder-text {
@@ -148,6 +160,7 @@
   border-radius: 8px;
   padding: 4px 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
 .light .zoom-controls {
@@ -181,4 +194,136 @@
 
 .light .zoom-value {
   color: #0f172a !important;
+}
+
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================ */
+
+/* Tablets */
+@media (max-width: 991px) {
+  .bottom-toolbar {
+    height: 64px;
+    padding: 0 16px;
+    gap: 16px;
+  }
+  
+  .slider-container {
+    width: 100px;
+  }
+  
+  .slider-container.small {
+    width: 80px;
+  }
+  
+  .section-value {
+    font-size: 13px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .bottom-toolbar {
+    height: 56px;
+    padding: 0 12px;
+    gap: 12px;
+  }
+  
+  .toolbar-section {
+    min-width: 50px;
+  }
+  
+  .section-label {
+    font-size: 9px !important;
+  }
+  
+  .section-value {
+    font-size: 12px !important;
+  }
+  
+  .slider-container {
+    width: 80px;
+  }
+  
+  .slider-container.small {
+    width: 60px;
+  }
+  
+  .color-picker {
+    gap: 8px;
+  }
+  
+  .color-swatch {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toolbar-divider {
+    height: 32px;
+  }
+  
+  .placeholder-text {
+    font-size: 12px !important;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 575px) {
+  .bottom-toolbar {
+    height: auto;
+    min-height: 52px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .toolbar-section:nth-child(3),
+  .toolbar-section:nth-child(4) {
+    display: none; /* Hide some sections on very small screens */
+  }
+  
+  .zoom-controls {
+    margin-left: auto;
+  }
+  
+  .zoom-value {
+    font-size: 11px !important;
+    min-width: 32px;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 375px) {
+  .bottom-toolbar {
+    padding: 6px 8px;
+  }
+  
+  .section-label {
+    font-size: 8px !important;
+  }
+  
+  .section-value {
+    font-size: 11px !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .bottom-toolbar {
+    height: 48px;
+    padding: 4px 12px;
+  }
+  
+  .toolbar-section {
+    min-width: 45px;
+  }
+  
+  .slider-container {
+    width: 70px;
+  }
+  
+  .color-swatch {
+    width: 22px;
+    height: 22px;
+  }
 }

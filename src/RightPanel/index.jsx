@@ -9,11 +9,15 @@ import {
   Snackbar,
   Alert,
   IconButton,
+  Drawer,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Close as CloseIcon,
   Undo as UndoIcon,
   Redo as RedoIcon,
+  ChevronRight as ClosePanelIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import Histogram from './Histogram';
@@ -64,7 +68,11 @@ export default function RightPanel({
   canRedo,
   onUndo,
   onRedo,
+  isOpen,
+  onClose,
 }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [snackBar, setSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [localAdjustments, setLocalAdjustments] = useState({
@@ -181,13 +189,23 @@ export default function RightPanel({
     }
   };
 
-  return (
-    <Box className={`right-panel ${darkMode ? 'dark' : 'light'}`}>
+  const panelContent = (
+    <>
+      {isMobile && (
+        <Box className="mobile-panel-header">
+          <Typography className="mobile-panel-title">Adjustments</Typography>
+          <IconButton onClick={onClose} size="small" className="mobile-close-btn">
+            <ClosePanelIcon />
+          </IconButton>
+        </Box>
+      )}
+      
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         autoHideDuration={5000}
         open={snackBar}
         onClose={() => setSnackBar(false)}
+        style={{ top: isMobile ? 60 : 0 }}
       >
         <Alert
           severity="error"
@@ -428,6 +446,30 @@ export default function RightPanel({
           )}
         </Box>
       )}
+    </>
+  );
+  
+  // Mobile drawer version
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="right"
+        open={isOpen}
+        onClose={onClose}
+        className="right-panel-drawer"
+        PaperProps={{
+          className: `right-panel mobile ${darkMode ? 'dark' : 'light'}`
+        }}
+      >
+        {panelContent}
+      </Drawer>
+    );
+  }
+  
+  // Desktop version
+  return (
+    <Box className={`right-panel ${darkMode ? 'dark' : 'light'}`}>
+      {panelContent}
     </Box>
   );
 }

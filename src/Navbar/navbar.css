@@ -37,6 +37,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.02em !important;
+  white-space: nowrap;
 }
 
 .light .navbar-logo {
@@ -44,6 +45,62 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  color: #94a3b8 !important;
+  margin-right: 8px;
+  display: none;
+}
+
+.mobile-menu-btn:hover {
+  color: #f8fafc !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Mobile Drawer */
+.mobile-drawer .MuiDrawer-paper {
+  background-color: #1a1a24 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  width: 280px;
+}
+
+.light .mobile-drawer .MuiDrawer-paper {
+  background-color: #ffffff !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+}
+
+.mobile-drawer-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.mobile-menu-list {
+  padding: 8px 0;
+}
+
+.mobile-menu-list .MuiListItem-root {
+  padding: 12px 16px;
+  color: #f8fafc;
+}
+
+.light .mobile-menu-list .MuiListItem-root {
+  color: #0f172a;
+}
+
+.mobile-menu-list .MuiListItem-root:hover {
+  background-color: rgba(167, 139, 250, 0.1);
 }
 
 /* Menu Buttons */
@@ -162,6 +219,7 @@
   padding: 6px 16px !important;
   border-radius: 6px !important;
   height: 32px;
+  white-space: nowrap;
 }
 
 .share-button {
@@ -195,4 +253,129 @@
   background: linear-gradient(135deg, #c4b5fd, #a78bfa) !important;
   box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4) !important;
   transform: translateY(-1px);
+}
+
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================ */
+
+/* Tablets and below */
+@media (max-width: 991px) {
+  .navbar {
+    height: 44px;
+    min-height: 44px !important;
+  }
+  
+  .navbar-toolbar {
+    min-height: 44px !important;
+    height: 44px;
+    padding: 0 12px !important;
+  }
+  
+  .navbar-logo {
+    font-size: 15px !important;
+  }
+  
+  .navbar-menu-button {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+  }
+  
+  .navbar-action-button {
+    padding: 4px 12px !important;
+    font-size: 12px !important;
+    height: 30px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
+  .navbar-menus {
+    display: none !important;
+  }
+  
+  .navbar-brand {
+    margin-right: auto;
+    margin-left: 8px;
+  }
+  
+  .navbar-logo {
+    font-size: 14px !important;
+  }
+  
+  .navbar-actions {
+    gap: 4px;
+  }
+  
+  .navbar-action-button {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+  
+  .export-button .MuiButton-startIcon {
+    margin-right: 4px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 575px) {
+  .navbar {
+    height: 40px;
+    min-height: 40px !important;
+  }
+  
+  .navbar-toolbar {
+    min-height: 40px !important;
+    height: 40px;
+    padding: 0 8px !important;
+  }
+  
+  .navbar-logo {
+    font-size: 13px !important;
+  }
+  
+  .share-button {
+    display: none !important;
+  }
+  
+  .export-button {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* Very small mobile */
+@media (max-width: 375px) {
+  .navbar-logo {
+    font-size: 12px !important;
+  }
+  
+  .export-button {
+    padding: 4px 6px !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .navbar {
+    height: 36px;
+    min-height: 36px !important;
+  }
+  
+  .navbar-toolbar {
+    min-height: 36px !important;
+    height: 36px;
+  }
+  
+  .navbar-logo {
+    font-size: 13px !important;
+  }
+  
+  .mobile-drawer .MuiDrawer-paper {
+    width: 240px;
+  }
 }

@@ -16,12 +16,54 @@
   border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+/* Mobile drawer version */
+.left-toolbar.mobile {
+  width: 240px !important;
+  padding: 0;
+}
+
+.left-toolbar-drawer .MuiDrawer-paper {
+  background: linear-gradient(180deg, #13131a 0%, #0a0a0f 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.light .left-toolbar-drawer .MuiDrawer-paper {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.mobile-toolbar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  margin-bottom: 12px;
+}
+
+.mobile-toolbar-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.mobile-close-btn {
+  color: #ffffff !important;
+}
+
 .toolbar-top,
 .toolbar-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+}
+
+.left-toolbar.mobile .toolbar-top,
+.left-toolbar.mobile .toolbar-bottom {
+  padding: 0 16px;
+  align-items: flex-start;
 }
 
 .toolbar-button {
@@ -87,4 +129,77 @@
 
 .MuiTooltip-arrow {
   color: #1a1a24 !important;
+}
+
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================ */
+
+/* Tablets */
+@media (max-width: 991px) {
+  .left-toolbar {
+    width: 56px;
+    padding: 8px 0;
+  }
+  
+  .toolbar-button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  
+  .toolbar-icon {
+    font-size: 18px !important;
+  }
+}
+
+/* Mobile - Left toolbar becomes drawer */
+@media (max-width: 767px) {
+  .left-toolbar {
+    display: none; /* Hidden on mobile, shown as drawer */
+  }
+  
+  .left-toolbar.mobile {
+    display: flex;
+    width: 240px !important;
+  }
+  
+  .left-toolbar.mobile .toolbar-button {
+    width: 100% !important;
+    height: 48px !important;
+    justify-content: flex-start;
+    padding-left: 16px !important;
+  }
+  
+  .left-toolbar.mobile .toolbar-icon {
+    margin-right: 16px;
+  }
+  
+  .active-indicator {
+    left: 0;
+    width: 4px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 375px) {
+  .left-toolbar.mobile {
+    width: 200px !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .left-toolbar {
+    width: 44px;
+    padding: 8px 0;
+  }
+  
+  .toolbar-button {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .toolbar-icon {
+    font-size: 16px !important;
+  }
 }

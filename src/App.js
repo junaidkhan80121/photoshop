@@ -16,6 +16,8 @@ function App() {
   const [backDrop, setBackDrop] = useState(false);
   const [compressionFactor, setCompressionFactor] = useState(0.8);
   const [activePanel, setActivePanel] = useState("adjust");
+  const [leftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
   
   // Adjustment values
   const [adjustments, setAdjustments] = useState({
@@ -77,6 +79,18 @@ function App() {
     }
     setImage(newImage);
   }, [history.length]);
+
+  // Toggle left panel (for mobile)
+  const toggleLeftPanel = useCallback(() => {
+    setLeftPanelOpen(prev => !prev);
+    setRightPanelOpen(false);
+  }, []);
+
+  // Toggle right panel (for mobile)
+  const toggleRightPanel = useCallback(() => {
+    setRightPanelOpen(prev => !prev);
+    setLeftPanelOpen(false);
+  }, []);
 
   const theme = createTheme({
     palette: {
@@ -144,12 +158,27 @@ function App() {
           setDarkMode={setDarkMode}
           image={image}
           setImage={handleSetImage}
+          onToggleLeftPanel={toggleLeftPanel}
+          onToggleRightPanel={toggleRightPanel}
         />
         <div className="main-layout">
+          {/* Overlay for mobile panels */}
+          {(leftPanelOpen || rightPanelOpen) && (
+            <div 
+              className="panel-overlay active"
+              onClick={() => {
+                setLeftPanelOpen(false);
+                setRightPanelOpen(false);
+              }}
+            />
+          )}
+          
           <LeftToolbar 
             activeTool={activeTool} 
             setActiveTool={setActiveTool}
             darkMode={darkMode}
+            isOpen={leftPanelOpen}
+            onClose={() => setLeftPanelOpen(false)}
           />
           <div className="canvas-area">
             <ImageCanvas 
@@ -184,6 +213,8 @@ function App() {
             canRedo={historyIndex < history.length - 1}
             onUndo={handleUndo}
             onRedo={handleRedo}
+            isOpen={rightPanelOpen}
+            onClose={() => setRightPanelOpen(false)}
           />
         </div>
       </div>

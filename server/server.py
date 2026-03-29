@@ -5,7 +5,6 @@ import os
 import base64
 import numpy as np
 from pymongo import MongoClient
-from pymongo.server_api import ServerApi
 from datetime import datetime
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -23,8 +22,11 @@ limiter = Limiter(
 )
 
 load_dotenv()
-DB_PASS = os.getenv("DB_PASSKEY")
-MONGO_DB_URI = "mongodb+srv://khanjunaid80121:"+DB_PASS+"@cluster0.exfs3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# MongoDB Configuration from Environment Variables
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "Photoshop")
+MONGO_COLLECTION_NAME = os.getenv("MONGO_COLLECTION_NAME", "logs")
 
 # Helper function to decode base64 image
 def decode_base64_image(base64_string):
@@ -45,9 +47,9 @@ def apply_adjustments():
     client_ip = request.headers.getlist('X-Forwarded-For')[0] if 'X-Forwarded-For' in request.headers else request.remote_addr
     
     try:
-        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
-        db = client['Photoshop']
-        collection = db['logs']
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
         
         image = decode_base64_image(data['image'])
         
@@ -115,9 +117,9 @@ def crop_image():
     client_ip = request.headers.getlist('X-Forwarded-For')[0] if 'X-Forwarded-For' in request.headers else request.remote_addr
     
     try:
-        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
-        db = client['Photoshop']
-        collection = db['logs']
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
         
         image = decode_base64_image(data['image'])
         
@@ -162,9 +164,9 @@ def rotate_image():
     client_ip = request.headers.getlist('X-Forwarded-For')[0] if 'X-Forwarded-For' in request.headers else request.remote_addr
     
     try:
-        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
-        db = client['Photoshop']
-        collection = db['logs']
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
         
         image = decode_base64_image(data['image'])
         angle = float(data.get('angle', 0))
@@ -214,9 +216,9 @@ def flip_image():
     client_ip = request.headers.getlist('X-Forwarded-For')[0] if 'X-Forwarded-For' in request.headers else request.remote_addr
     
     try:
-        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
-        db = client['Photoshop']
-        collection = db['logs']
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
         
         image = decode_base64_image(data['image'])
         flip_code = int(data.get('flip_code', 1))  # 1: horizontal, 0: vertical, -1: both
@@ -252,9 +254,9 @@ def apply_filter():
         return jsonify({"message": "Missing 'filter' or 'image' in request data"}), 400
     try:
         clientIP = request.remote_addr
-        client = MongoClient(MONGO_DB_URI, server_api=ServerApi('1'))
-        db = client['Photoshop']
-        collection = db['logs']
+        client = MongoClient(MONGO_URI)
+        db = client[MONGO_DB_NAME]
+        collection = db[MONGO_COLLECTION_NAME]
         base64_image = data['image']
         image_data = base64.b64decode(base64_image.split(',')[1])
         np_array = np.frombuffer(image_data, np.uint8)

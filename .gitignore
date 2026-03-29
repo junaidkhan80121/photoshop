@@ -9,6 +9,7 @@
 /coverage
 
 .env
+server/.env
 # production
 /build
 /backend/.env

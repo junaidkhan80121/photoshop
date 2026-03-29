@@ -127,6 +127,7 @@ const ImageCropper = ({ darkMode }) => {
             Actions={Actions}
             compressionFactor={compressionFactor}
             setCompressionFactor={setCompressionFactor}
+            darkMode={darkMode}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 10, lg: 10 }}>
@@ -148,9 +149,16 @@ const ImageCropper = ({ darkMode }) => {
                 />
                 <label
                   htmlFor="fileInput"
-                  style={{ cursor: "pointer", color: "#1976d2", marginTop: "10px" }}
+                  style={{ 
+                    cursor: "pointer", 
+                    color: darkMode ? "#0a84ff" : "#1976d2", 
+                    marginTop: "10px",
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 500,
+                    textDecoration: "underline"
+                  }}
                 >
-                  <Typography>Click To Upload</Typography>
+                  <Typography sx={{ fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>Click To Upload</Typography>
                 </label>
               </Box>
             </Box>

@@ -13,7 +13,7 @@ import CompressIcon from '@mui/icons-material/Compress';
 import axios from 'axios';
 import './index.css';
 
-export default function DrawerComponent({ image, setImage, setActions, Actions, setbackDrop, compressionFactor, setCompressionFactor }) {
+export default function DrawerComponent({ image, setImage, setActions, Actions, setbackDrop, compressionFactor, setCompressionFactor, darkMode }) {
   const filters = [
     { 'title': 'GrayScale', 'filter': 'grayscale', 'image': './filter_preview/grayscale.png' },
     { 'title': 'Emboss', 'filter': 'emboss', 'image': './filter_preview/emboss.png' },
@@ -69,7 +69,7 @@ export default function DrawerComponent({ image, setImage, setActions, Actions, 
   };
 
   return (
-    <Box sx={{ height: "90vh", overflowY: "scroll", overflowX: 'hidden' }}>
+    <Box className={darkMode ? "drawer-dark" : "drawer-light"} sx={{ height: "90vh", overflowY: "scroll", overflowX: 'hidden' }}>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         autoHideDuration={5000}

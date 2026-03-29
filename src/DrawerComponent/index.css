@@ -1,29 +1,183 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Lexend+Deca:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Noto+Sans+JP:wght@100..900&family=Parkinsans:wght@300..800&family=Permanent+Marker&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&family=Special+Elite&display=swap');
+/* Modern DrawerComponent Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 10px; /* Adjust the width of the scrollbar */
-  }
-  
-  /* Customize the draggable thumb */
-  ::-webkit-scrollbar-thumb {
-    background-color: rgb(240, 237, 237); /* Set the thumb color */
-    border-radius: 10px; /* Optional: Make the thumb rounded */
-  }
-  
-  /* Customize the track */
-  ::-webkit-scrollbar-track {
-    background-color: gray; /* Set the track color */
-  }
+  width: 6px;
+}
 
-  .filters-section{
-    display:"flex";
-    align-items:"center";
-    cursor:"pointer";
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
+::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 3px;
+}
 
-  .sub-category-font {
-    font-family: "Poppins", serif;
-    font-weight: 300;
-    font-style: normal;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background-color: #a1a1a1;
+}
+
+.filters-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sub-category-font {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+}
+
+/* Light Mode - Default Styles */
+.drawer-light {
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Dark Mode Styles */
+.drawer-dark {
+  background-color: #1c1c1e;
+  color: #f5f5f7;
+}
+
+.drawer-dark .MuiTypography-body1,
+.drawer-dark .MuiTypography-subtitle2,
+.drawer-dark .MuiTypography-gutterBottom {
+  color: #f5f5f7;
+}
+
+/* Modern Accordion Styling - Light Mode */
+.MuiAccordion-root {
+  background-color: #fafafa !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+.MuiAccordion-root:first-of-type {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+.MuiAccordion-root:last-of-type {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.MuiAccordion-root:before {
+  display: none !important;
+}
+
+.MuiAccordionSummary-root {
+  padding: 12px 20px !important;
+  min-height: 48px !important;
+  transition: background-color 0.2s ease !important;
+  color: #1a1a1a;
+}
+
+.MuiAccordionSummary-root:hover {
+  background-color: #f0f0f0 !important;
+}
+
+.MuiAccordionSummary-content {
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.MuiAccordionDetails-root {
+  padding: 8px 20px 16px !important;
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Dark Mode Accordion Styles */
+.drawer-dark .MuiAccordion-root {
+  background-color: #1c1c1e !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.drawer-dark .MuiAccordionSummary-root {
+  color: #f5f5f7;
+}
+
+.drawer-dark .MuiAccordionSummary-root:hover {
+  background-color: #2c2c2e !important;
+}
+
+.drawer-dark .MuiAccordionDetails-root {
+  background-color: #1c1c1e;
+  color: #f5f5f7;
+}
+
+/* Filter Item Styling */
+.MuiListItem-root {
+  padding: 4px 0 !important;
+  transition: transform 0.15s ease !important;
+  color: inherit;
+}
+
+.MuiListItem-root:hover {
+  transform: translateX(4px);
+}
+
+.drawer-dark .MuiListItem-root {
+  color: #f5f5f7;
+}
+
+/* Slider Modern Styling */
+.MuiSlider-root {
+  color: #1976d2 !important;
+  height: 4px !important;
+}
+
+.MuiSlider-root .MuiSlider-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  background-color: #1976d2 !important;
+  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3) !important;
+}
+
+.MuiSlider-root .MuiSlider-thumb:hover {
+  box-shadow: 0 2px 10px rgba(25, 118, 210, 0.5) !important;
+}
+
+.MuiSlider-root .MuiSlider-track {
+  height: 4px !important;
+  border-radius: 2px !important;
+}
+
+.MuiSlider-root .MuiSlider-rail {
+  height: 4px !important;
+  background-color: #e0e0e0 !important;
+  border-radius: 2px !important;
+}
+
+.drawer-dark .MuiSlider-rail {
+  background-color: #39393d !important;
+}
+
+/* Typography in Drawer */
+.MuiTypography-body1,
+.MuiTypography-subtitle2 {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Box container */
+.MuiBox-root {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Scrollbar Dark Mode */
+.drawer-dark ::-webkit-scrollbar-thumb {
+  background-color: #5a5a5a;
+}
+
+.drawer-dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #6a6a6a;
+}

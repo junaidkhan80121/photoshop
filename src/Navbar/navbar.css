@@ -1,74 +1,198 @@
-/* Navbar Styles - Flat & Minimal */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Obsidian Lens Navbar Styles */
 
-/* AppBar - Clean & Flat */
-.MuiAppBar-root {
-  font-family: 'Inter', sans-serif !important;
-  border-bottom: 1px solid #e5e7eb !important;
+.navbar {
+  background: linear-gradient(180deg, #1a1a24 0%, #13131a 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  height: 48px;
+  min-height: 48px !important;
 }
 
-.MuiToolbar-root {
-  font-family: 'Inter', sans-serif !important;
-  padding: 0 24px !important;
-  min-height: 56px !important;
+.light .navbar {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Typography */
-.MuiTypography-root {
+.navbar-toolbar {
+  min-height: 48px !important;
+  height: 48px;
+  padding: 0 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Brand/Logo */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
+}
+
+.navbar-logo {
   font-family: 'Inter', sans-serif !important;
-  font-weight: 600 !important;
   font-size: 16px !important;
-  letter-spacing: -0.01em !important;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em !important;
 }
 
-/* Switch - Minimal */
-.MuiSwitch-root {
+.light .navbar-logo {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Menu Buttons */
+.navbar-menus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.navbar-menu-button {
+  color: #94a3b8 !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  text-transform: capitalize !important;
+  padding: 6px 12px !important;
+  min-width: auto !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.navbar-menu-button:hover {
+  color: #f8fafc !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.light .navbar-menu-button {
+  color: #64748b !important;
+}
+
+.light .navbar-menu-button:hover {
+  color: #0f172a !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.menu-arrow {
+  font-size: 16px !important;
+  margin-left: -4px !important;
+}
+
+/* Dropdown Menu */
+.dropdown-paper {
+  background-color: #1a1a24 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  margin-top: 4px !important;
+}
+
+.light .dropdown-paper {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.navbar-dropdown .MuiMenuItem-root {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  color: #f8fafc !important;
+  padding: 8px 16px !important;
+  min-height: 36px !important;
+}
+
+.light .navbar-dropdown .MuiMenuItem-root {
+  color: #0f172a !important;
+}
+
+.navbar-dropdown .MuiMenuItem-root:hover {
+  background-color: rgba(167, 139, 250, 0.1) !important;
+}
+
+.menu-divider {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  margin: 4px 0 !important;
+}
+
+.light .menu-divider {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Right Actions */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.navbar-icon-button {
+  color: #94a3b8 !important;
   padding: 8px !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease !important;
 }
 
-.MuiSwitch-switchBase {
-  padding: 0 !important;
-  margin: 4px !important;
-  transition-duration: 200ms !important;
+.navbar-icon-button:hover {
+  color: #f8fafc !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-.MuiSwitch-switchBase.Mui-checked {
-  transform: translateX(16px) !important;
+.light .navbar-icon-button {
+  color: #64748b !important;
 }
 
-.MuiSwitch-thumb {
-  width: 18px !important;
-  height: 18px !important;
-  box-shadow: none !important;
-  border: 1px solid transparent !important;
+.light .navbar-icon-button:hover {
+  color: #0f172a !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
-.MuiSwitch-track {
-  width: 36px !important;
-  height: 20px !important;
-  border-radius: 10px !important;
-  opacity: 1 !important;
+.navbar-action-button {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  padding: 6px 16px !important;
+  border-radius: 6px !important;
+  height: 32px;
 }
 
-/* Light mode switch (dark mode active) */
-.MuiSwitch-track {
-  background-color: #18181b !important;
-  border: 1px solid #18181b !important;
+.share-button {
+  color: #f8fafc !important;
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Dark mode switch (light mode active) */
-.MuiSwitch-root:not(.Mui-checked) .MuiSwitch-track {
-  background-color: #d4d4d8 !important;
-  border-color: #d4d4d8 !important;
+.share-button:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-.MuiSwitch-root.Mui-checked .MuiSwitch-track {
-  background-color: #71717a !important;
-  opacity: 1 !important;
+.light .share-button {
+  color: #0f172a !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Icons */
-.MuiSvgIcon-root {
-  font-size: 20px !important;
-  margin-left: 4px;
+.light .share-button:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.export-button {
+  background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3) !important;
+}
+
+.export-button:hover {
+  background: linear-gradient(135deg, #c4b5fd, #a78bfa) !important;
+  box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4) !important;
+  transform: translateY(-1px);
 }

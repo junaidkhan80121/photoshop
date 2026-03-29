@@ -1,0 +1,90 @@
+/* Left Toolbar Styles */
+
+.left-toolbar {
+  width: 64px;
+  height: 100%;
+  background: linear-gradient(180deg, #13131a 0%, #0a0a0f 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.left-toolbar.light {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.toolbar-top,
+.toolbar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-button {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 10px !important;
+  color: #64748b !important;
+  position: relative;
+  transition: all 0.15s ease !important;
+}
+
+.left-toolbar.light .toolbar-button {
+  color: #64748b !important;
+}
+
+.toolbar-button:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: #94a3b8 !important;
+}
+
+.left-toolbar.light .toolbar-button:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: #475569 !important;
+}
+
+.toolbar-button.active {
+  background-color: rgba(167, 139, 250, 0.15) !important;
+  color: #a78bfa !important;
+}
+
+.left-toolbar.light .toolbar-button.active {
+  background-color: rgba(124, 58, 237, 0.1) !important;
+  color: #7c3aed !important;
+}
+
+.toolbar-icon {
+  font-size: 20px !important;
+}
+
+.active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: linear-gradient(180deg, #a78bfa, #f472b6);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Tooltip customization */
+.MuiTooltip-tooltip {
+  background-color: #1a1a24 !important;
+  color: #f8fafc !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.MuiTooltip-arrow {
+  color: #1a1a24 !important;
+}

@@ -1,0 +1,110 @@
+/* Image Canvas Styles */
+
+.image-canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0a0f;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-canvas.light {
+  background-color: #f8fafc;
+}
+
+.image-canvas.drag-active::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 2px dashed #a78bfa;
+  border-radius: 16px;
+  background-color: rgba(167, 139, 250, 0.05);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Canvas Container */
+.canvas-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Upload Placeholder */
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-label {
+  cursor: pointer;
+}
+
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 80px;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s ease;
+}
+
+.light .upload-zone {
+  border-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.upload-zone:hover,
+.upload-zone.active {
+  border-color: #a78bfa;
+  background-color: rgba(167, 139, 250, 0.05);
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  font-size: 48px !important;
+  color: #a78bfa !important;
+  margin-bottom: 16px;
+}
+
+.upload-title {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #f8fafc !important;
+  margin-bottom: 8px !important;
+}
+
+.light .upload-title {
+  color: #0f172a !important;
+}
+
+.upload-subtitle {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  color: #64748b !important;
+  margin-bottom: 16px !important;
+}
+
+.upload-hint {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 12px !important;
+  color: #475569 !important;
+  background-color: rgba(255, 255, 255, 0.04);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.light .upload-hint {
+  background-color: rgba(0, 0, 0, 0.04);
+}

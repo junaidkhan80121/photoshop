@@ -1,27 +1,57 @@
-/* App Container Styles */
+/* App Container Styles - Flat & Minimal */
 .MuiDialog-root {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 .MuiDialog-paper {
   border-radius: 12px !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.MuiDialogTitle-root {
+  font-family: 'Inter', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: -0.01em !important;
+  padding: 20px 24px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.MuiDialogContent-root {
+  font-family: 'Inter', sans-serif !important;
+  padding: 24px !important;
+}
+
+.MuiDialogContentText-root {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #52525b !important;
+}
+
+.MuiDialogActions-root {
+  padding: 16px 24px !important;
+  border-top: 1px solid #e5e7eb !important;
+  gap: 8px !important;
 }
 
 .MuiButton-root {
   text-transform: none !important;
   font-weight: 500 !important;
   border-radius: 8px !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.15s ease !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
 }
 
 .MuiButton-root:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Backdrop overlay */
 .MuiBackdrop-root {
-  background-color: rgba(0, 0, 0, 0.7) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
   backdrop-filter: blur(4px);
 }

@@ -1,46 +1,74 @@
-/* Modern Navbar Styles */
+/* Navbar Styles - Flat & Minimal */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-.navbar-links {
-  font-family: "Inter", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.links {
-  text-decoration: none;
-  color: white;
-  margin: 0px 20px 0px 20px;
-  transition: opacity 0.2s ease;
-}
-
-.links:hover {
-  opacity: 0.8;
-}
-
-/* AppBar Modern Styling */
+/* AppBar - Clean & Flat */
 .MuiAppBar-root {
-  background-color: #1a1a1a !important;
-  color: white !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-  border-bottom: 1px solid #333;
+  font-family: 'Inter', sans-serif !important;
+  border-bottom: 1px solid #e5e7eb !important;
 }
 
 .MuiToolbar-root {
+  font-family: 'Inter', sans-serif !important;
   padding: 0 24px !important;
-  min-height: 64px !important;
+  min-height: 56px !important;
 }
 
+/* Typography */
 .MuiTypography-root {
   font-family: 'Inter', sans-serif !important;
-  letter-spacing: -0.01em;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: -0.01em !important;
 }
 
+/* Switch - Minimal */
 .MuiSwitch-root {
-  margin-left: auto;
+  padding: 8px !important;
 }
 
-/* Dark mode AppBar */
-.MuiAppBar-root.MuiAppBar-positionStatic {
-  background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%) !important;
+.MuiSwitch-switchBase {
+  padding: 0 !important;
+  margin: 4px !important;
+  transition-duration: 200ms !important;
+}
+
+.MuiSwitch-switchBase.Mui-checked {
+  transform: translateX(16px) !important;
+}
+
+.MuiSwitch-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  box-shadow: none !important;
+  border: 1px solid transparent !important;
+}
+
+.MuiSwitch-track {
+  width: 36px !important;
+  height: 20px !important;
+  border-radius: 10px !important;
+  opacity: 1 !important;
+}
+
+/* Light mode switch (dark mode active) */
+.MuiSwitch-track {
+  background-color: #18181b !important;
+  border: 1px solid #18181b !important;
+}
+
+/* Dark mode switch (light mode active) */
+.MuiSwitch-root:not(.Mui-checked) .MuiSwitch-track {
+  background-color: #d4d4d8 !important;
+  border-color: #d4d4d8 !important;
+}
+
+.MuiSwitch-root.Mui-checked .MuiSwitch-track {
+  background-color: #71717a !important;
+  opacity: 1 !important;
+}
+
+/* Icons */
+.MuiSvgIcon-root {
+  font-size: 20px !important;
+  margin-left: 4px;
 }

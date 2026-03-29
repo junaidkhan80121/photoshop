@@ -10,9 +10,18 @@
 
 .env
 server/.env
+/backend/.env
+
+# python virtual environments
+venv/
+env/
+ENV/
+.venv/
+server/venv/
+server/env/
+
 # production
 /build
-/backend/.env
 
 # misc
 .DS_Store

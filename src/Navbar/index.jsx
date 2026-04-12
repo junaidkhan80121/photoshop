@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Tooltip,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -23,10 +24,12 @@ import {
   CloudUpload as UploadIcon,
   Menu as MenuIcon,
   ChevronRight as ChevronRightIcon,
+  Brightness4 as DarkModeIcon,
+  Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
 import './navbar.css';
 
-export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggleLeftPanel, onToggleRightPanel }) {
+export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggleLeftPanel, onToggleRightPanel, onUndo, onRedo, canUndo, canRedo }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -127,11 +130,19 @@ export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggl
               <ListItemText primary="Adjustments" />
             </ListItem>
             <Divider />
-            {mobileMenuItems.map((item) => (
-              <ListItem button key={item.label}>
-                <ListItemText primary={item.label} />
-              </ListItem>
-            ))}
+            <ListItem button onClick={() => { onUndo?.(); setMobileMenuOpen(false); }} disabled={!canUndo}>
+              <ListItemText primary="Undo" />
+            </ListItem>
+            <ListItem button onClick={() => { onRedo?.(); setMobileMenuOpen(false); }} disabled={!canRedo}>
+              <ListItemText primary="Redo" />
+            </ListItem>
+            <Divider />
+            <ListItem button onClick={() => { setDarkMode(!darkMode); }}>
+              <ListItemText primary={darkMode ? 'Light Mode' : 'Dark Mode'} />
+              <span style={{ marginLeft: 'auto', opacity: 0.6 }}>
+                {darkMode ? '☀️' : '🌙'}
+              </span>
+            </ListItem>
             <Divider />
             <ListItem>
               <input
@@ -200,7 +211,39 @@ export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggl
                       <MenuItem onClick={() => handleMenuClose('file')}>Exit</MenuItem>
                     </>
                   )}
-                  {menu !== 'file' && menuItems[menu].map((item) => (
+                  {menu === 'edit' && (
+                    <>
+                      <MenuItem onClick={() => { onUndo?.(); handleMenuClose('edit'); }} disabled={!canUndo}>
+                        Undo <span style={{ marginLeft: 'auto', marginRight: 8, opacity: 0.6, fontSize: 12 }}>Ctrl+Z</span>
+                      </MenuItem>
+                      <MenuItem onClick={() => { onRedo?.(); handleMenuClose('edit'); }} disabled={!canRedo}>
+                        Redo <span style={{ marginLeft: 'auto', marginRight: 8, opacity: 0.6, fontSize: 12 }}>Ctrl+Shift+Z</span>
+                      </MenuItem>
+                      <Divider className="menu-divider" />
+                      <MenuItem onClick={() => handleMenuClose('edit')}>Cut</MenuItem>
+                      <MenuItem onClick={() => handleMenuClose('edit')}>Copy</MenuItem>
+                      <MenuItem onClick={() => handleMenuClose('edit')}>Paste</MenuItem>
+                      <Divider className="menu-divider" />
+                      <MenuItem onClick={() => handleMenuClose('edit')}>Preferences</MenuItem>
+                    </>
+                  )}
+                  {menu === 'view' && (
+                    <>
+                      {menuItems[menu].map((item) => (
+                        <MenuItem key={item} onClick={() => handleMenuClose(menu)}>
+                          {item}
+                        </MenuItem>
+                      ))}
+                      <Divider className="menu-divider" />
+                      <MenuItem onClick={() => { setDarkMode(!darkMode); handleMenuClose('view'); }}>
+                        {darkMode ? 'Light Mode' : 'Dark Mode'}
+                        <span style={{ marginLeft: 'auto', marginRight: 8, opacity: 0.6, fontSize: 12 }}>
+                          {darkMode ? '☀️' : '🌙'}
+                        </span>
+                      </MenuItem>
+                    </>
+                  )}
+                  {menu !== 'file' && menu !== 'edit' && menu !== 'view' && menuItems[menu].map((item) => (
                     <MenuItem key={item} onClick={() => handleMenuClose(menu)}>
                       {item}
                     </MenuItem>
@@ -213,6 +256,17 @@ export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggl
 
         {/* Right Actions */}
         <Box className="navbar-actions">
+          {/* Dark Mode Toggle */}
+          <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+            <IconButton
+              className="navbar-icon-button"
+              onClick={() => setDarkMode(!darkMode)}
+              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+            >
+              {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+          </Tooltip>
+
           {!isMobile && (
             <>
               <input

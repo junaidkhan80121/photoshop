@@ -1,7 +1,7 @@
 import "./App.css";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import NavBar from "./Navbar";
 import LeftToolbar from "./LeftToolbar";
 import RightPanel from "./RightPanel";
@@ -149,6 +149,34 @@ function App() {
     setAdjustments(prev => ({ ...prev, [key]: value }));
   };
 
+  // Persist dark mode to localStorage
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode.toString());
+  }, [darkMode]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Undo: Ctrl+Z
+      if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (historyIndex > 0) {
+          handleUndo();
+        }
+      }
+      // Redo: Ctrl+Shift+Z or Ctrl+Y
+      if ((e.ctrlKey && e.shiftKey && e.key === 'Z') || (e.ctrlKey && e.key === 'y')) {
+        e.preventDefault();
+        if (historyIndex < history.length - 1) {
+          handleRedo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [historyIndex, history.length, handleUndo, handleRedo]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -160,6 +188,10 @@ function App() {
           setImage={handleSetImage}
           onToggleLeftPanel={toggleLeftPanel}
           onToggleRightPanel={toggleRightPanel}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < history.length - 1}
         />
         <div className="main-layout">
           {/* Overlay for mobile panels */}

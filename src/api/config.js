@@ -1,14 +1,20 @@
-// API Configuration
-// Backend URL is loaded from environment variables
+// API configuration loaded only from environment variables.
+const API_BASE_URL = process.env.REACT_APP_API_URL?.trim();
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+if (!API_BASE_URL) {
+  throw new Error(
+    'Missing REACT_APP_API_URL. Define it in frontend .env or your deployment environment.'
+  );
+}
+
+const buildUrl = (path) => `${API_BASE_URL}${path}`;
 
 export const API_ENDPOINTS = {
-  ADJUST: `${API_BASE_URL}/adjust`,
-  FILTER: `${API_BASE_URL}/filter`,
-  CROP: `${API_BASE_URL}/crop`,
-  ROTATE: `${API_BASE_URL}/rotate`,
-  FLIP: `${API_BASE_URL}/flip`,
+  ADJUST: buildUrl('/adjust'),
+  FILTER: buildUrl('/filter'),
+  CROP: buildUrl('/crop'),
+  ROTATE: buildUrl('/rotate'),
+  FLIP: buildUrl('/flip'),
 };
 
 export default API_BASE_URL;

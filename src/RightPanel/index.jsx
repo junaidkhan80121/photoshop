@@ -22,6 +22,7 @@ import {
 import axios from 'axios';
 import Histogram from './Histogram';
 import ToneCurve from './ToneCurve';
+import { API_ENDPOINTS } from '../api/config';
 import './index.css';
 
 const filters = [
@@ -48,9 +49,6 @@ const presets = [
   { id: 'matte_wb', name: 'MATTE_W_B', filters: { contrast: -15, highlights: -10 } },
   { id: 'pro_mist', name: 'PRO_MIST', filters: { exposure: 15, highlights: -30 } },
 ];
-
-// API base URL - update this to your backend URL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function RightPanel({
   darkMode,
@@ -100,7 +98,7 @@ export default function RightPanel({
 
     try {
       setBackDrop(true);
-      const response = await axios.post(`${API_URL}/adjust`, {
+      const response = await axios.post(API_ENDPOINTS.ADJUST, {
         image: image,
         ...adjustments
       });
@@ -139,7 +137,7 @@ export default function RightPanel({
     }
     try {
       setBackDrop(true);
-      const response = await axios.post(`${API_URL}/filter`, {
+      const response = await axios.post(API_ENDPOINTS.FILTER, {
         filter: filter,
         image: image,
       });

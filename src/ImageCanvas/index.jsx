@@ -4,9 +4,8 @@ import { CloudUpload as UploadIcon, CropFree as CropIcon } from '@mui/icons-mate
 import Cropper from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../api/config';
 import './index.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function ImageCanvas({
   image,
@@ -67,7 +66,7 @@ export default function ImageCanvas({
     
     try {
       setBackDrop(true);
-      const response = await axios.post(`${API_URL}/crop`, {
+      const response = await axios.post(API_ENDPOINTS.CROP, {
         image: image,
         x: Math.round(data.x),
         y: Math.round(data.y),
@@ -93,7 +92,7 @@ export default function ImageCanvas({
     
     try {
       setBackDrop(true);
-      const response = await axios.post(`${API_URL}/rotate`, {
+      const response = await axios.post(API_ENDPOINTS.ROTATE, {
         image: image,
         angle: angle,
       });

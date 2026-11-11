@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Box,
   Tabs,
@@ -19,10 +19,15 @@ import {
   Redo as RedoIcon,
   ChevronRight as ClosePanelIcon,
 } from '@mui/icons-material';
-import axios from 'axios';
 import Histogram from './Histogram';
 import ToneCurve from './ToneCurve';
-import { API_ENDPOINTS } from '../api/config';
+import {
+  applyAdjustments,
+  applyFilter,
+  CLIENT_FILTERS,
+  exportImage,
+  downloadDataUrl,
+} from '../utils/imageProcessing';
 import './index.css';
 
 const filters = [
@@ -50,6 +55,8 @@ const presets = [
   { id: 'pro_mist', name: 'PRO_MIST', filters: { exposure: 15, highlights: -30 } },
 ];
 
+const ZERO = { exposure: 0, contrast: 0, highlights: 0, shadows: 0 };
+
 export default function RightPanel({
   darkMode,
   activePanel,
@@ -62,6 +69,8 @@ export default function RightPanel({
   setBackDrop,
   compressionFactor,
   setCompressionFactor,
+  exportFormat = 'jpeg',
+  setExportFormat,
   canUndo,
   canRedo,
   onUndo,
@@ -73,79 +82,160 @@ export default function RightPanel({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [snackBar, setSnackBar] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
-  const [localAdjustments, setLocalAdjustments] = useState({
-    exposure: 0,
-    contrast: 0,
-    highlights: 0,
-    shadows: 0,
-  });
-  const debounceTimer = useRef(null);
+  const [localAdjustments, setLocalAdjustments] = useState(ZERO);
+  const [isLive, setIsLive] = useState(false);
 
-  const handleTabChange = (event, newValue) => {
-    setActivePanel(newValue);
-  };
+  // Unadjusted source for the current slider session — never overwritten by commits
+  const sessionBaseRef = useRef(null);
+  const ownedUpdateRef = useRef(false);
+  const previewRaf = useRef(null);
+  const previewToken = useRef(0);
+  const adjustmentsRef = useRef(ZERO);
+
+  const setOwnedImage = useCallback((nextImage) => {
+    ownedUpdateRef.current = true;
+    setImage(nextImage);
+  }, [setImage]);
+
+  const clearSliderValues = useCallback(() => {
+    setLocalAdjustments(ZERO);
+    adjustmentsRef.current = ZERO;
+    Object.keys(ZERO).forEach((k) => setAdjustments(k, 0));
+  }, [setAdjustments]);
+
+  // Adopt external image changes (upload / undo / redo / crop) as a new session base.
+  // Only react to `image` — owned panel updates keep the same session base + slider values.
+  useEffect(() => {
+    if (ownedUpdateRef.current) {
+      ownedUpdateRef.current = false;
+      return;
+    }
+    if (!image) {
+      sessionBaseRef.current = null;
+      setLocalAdjustments(ZERO);
+      adjustmentsRef.current = ZERO;
+      setIsLive(false);
+      return;
+    }
+    sessionBaseRef.current = image;
+    setLocalAdjustments(ZERO);
+    adjustmentsRef.current = ZERO;
+    Object.keys(ZERO).forEach((k) => setAdjustments(k, 0));
+    setIsLive(false);
+    // Intentionally only [image]: setAdjustments identity must not reset the session
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [image]);
 
   const showError = (message) => {
     setSnackBarMessage(message);
     setSnackBar(true);
   };
 
-  const applyAdjustments = useCallback(async (adjustments) => {
-    if (!image) {
-      showError('Please upload an image first');
+  const handleTabChange = (event, newValue) => {
+    setActivePanel(newValue);
+  };
+
+  const ensureSessionBase = () => {
+    if (!sessionBaseRef.current && image) {
+      sessionBaseRef.current = image;
+    }
+    return sessionBaseRef.current;
+  };
+
+  const runLivePreview = useCallback(async (next) => {
+    const source = sessionBaseRef.current;
+    if (!source) return;
+
+    const token = ++previewToken.current;
+    try {
+      const isZero = Object.values(next).every((v) => v === 0);
+      const preview = isZero
+        ? source
+        : await applyAdjustments(source, next, { preview: true, maxSide: 960 });
+      if (token !== previewToken.current) return;
+      setOwnedImage(preview);
+      setIsLive(!isZero);
+    } catch (e) {
+      console.error('Live preview failed:', e);
+    }
+  }, [setOwnedImage]);
+
+  const schedulePreview = useCallback((next) => {
+    if (previewRaf.current) cancelAnimationFrame(previewRaf.current);
+    previewRaf.current = requestAnimationFrame(() => {
+      runLivePreview(next);
+    });
+  }, [runLivePreview]);
+
+  const commitAdjustments = useCallback(async (next) => {
+    const source = sessionBaseRef.current;
+    if (!source) return;
+
+    const isZero = Object.values(next).every((v) => v === 0);
+    if (isZero) {
+      setOwnedImage(source);
+      setIsLive(false);
       return;
     }
 
     try {
       setBackDrop(true);
-      const response = await axios.post(API_ENDPOINTS.ADJUST, {
-        image: image,
-        ...adjustments
-      });
-      
-      if (response.data && response.data.image) {
-        setImage(response.data.image);
-        setActions(prev => [...prev, response.data.image]);
-      }
+      // Keep session base + slider values; only refresh the displayed/history image
+      const result = await applyAdjustments(source, next, { preview: false });
+      setOwnedImage(result);
+      setActions(result);
+      setIsLive(false);
       setBackDrop(false);
     } catch (e) {
-      console.error('Error applying adjustments:', e);
+      console.error('Commit adjustments failed:', e);
       showError('Error applying adjustments');
       setBackDrop(false);
     }
-  }, [image, setImage, setActions, setBackDrop]);
+  }, [setOwnedImage, setActions, setBackDrop]);
 
   const handleAdjustmentChange = (key, value) => {
-    setLocalAdjustments(prev => ({ ...prev, [key]: value }));
-    setAdjustments(key, value);
-    
-    // Debounce the API call
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-    
-    debounceTimer.current = setTimeout(() => {
-      const newAdjustments = { ...localAdjustments, [key]: value };
-      applyAdjustments(newAdjustments);
-    }, 300);
-  };
-
-  const getFilter = async (filter) => {
-    if (!image) {
+    if (!image && !sessionBaseRef.current) {
       showError('Please upload an image first');
       return;
     }
+    ensureSessionBase();
+
+    const next = { ...adjustmentsRef.current, [key]: value };
+    adjustmentsRef.current = next;
+    setLocalAdjustments(next);
+    setAdjustments(key, value);
+    schedulePreview(next);
+  };
+
+  const handleAdjustmentCommit = () => {
+    commitAdjustments(adjustmentsRef.current);
+  };
+
+  const getFilter = async (filterName) => {
+    const base = ensureSessionBase() || image;
+    if (!base) {
+      showError('Please upload an image first');
+      return;
+    }
+    if (!CLIENT_FILTERS.has(filterName)) {
+      showError('Filter not available offline');
+      return;
+    }
+
     try {
       setBackDrop(true);
-      const response = await axios.post(API_ENDPOINTS.FILTER, {
-        filter: filter,
-        image: image,
-      });
-      
-      if (response.data && response.data.image) {
-        setImage(response.data.image);
-        setActions(prev => [...prev, response.data.image]);
+      let source = base;
+      const hasAdj = Object.values(adjustmentsRef.current).some((v) => v !== 0);
+      if (hasAdj) {
+        source = await applyAdjustments(base, adjustmentsRef.current, { preview: false });
       }
+      const result = await applyFilter(source, filterName);
+      // Filters bake into a new session base; sliders reset
+      sessionBaseRef.current = result;
+      clearSliderValues();
+      setOwnedImage(result);
+      setActions(result);
+      setIsLive(false);
       setBackDrop(false);
     } catch (e) {
       console.error('Error applying filter:', e);
@@ -155,14 +245,17 @@ export default function RightPanel({
   };
 
   const applyPreset = async (preset) => {
-    if (!image) {
+    if (!image && !sessionBaseRef.current) {
       showError('Please upload an image first');
       return;
     }
-    
-    const newAdjustments = { ...localAdjustments, ...preset.filters };
-    setLocalAdjustments(newAdjustments);
-    await applyAdjustments(newAdjustments);
+    ensureSessionBase();
+
+    const next = { ...ZERO, ...preset.filters };
+    adjustmentsRef.current = next;
+    setLocalAdjustments(next);
+    Object.entries(next).forEach(([k, v]) => setAdjustments(k, v));
+    await commitAdjustments(next);
   };
 
   const formatValue = (value) => {
@@ -171,19 +264,39 @@ export default function RightPanel({
   };
 
   const resetAdjustments = () => {
-    setLocalAdjustments({
-      exposure: 0,
-      contrast: 0,
-      highlights: 0,
-      shadows: 0,
-    });
-    if (image) {
-      applyAdjustments({
-        exposure: 0,
-        contrast: 0,
-        highlights: 0,
-        shadows: 0,
+    const source = sessionBaseRef.current;
+    clearSliderValues();
+    setIsLive(false);
+    if (!source) return;
+    setOwnedImage(source);
+    setActions(source);
+  };
+
+  const handleUndoClick = () => {
+    onUndo?.();
+  };
+
+  const handleRedoClick = () => {
+    onRedo?.();
+  };
+
+  const handleDownload = async () => {
+    if (!image) {
+      showError('Please upload an image first');
+      return;
+    }
+    try {
+      setBackDrop(true);
+      const { dataUrl, extension } = await exportImage(image, {
+        format: exportFormat,
+        quality: compressionFactor,
       });
+      downloadDataUrl(dataUrl, `edited-image.${extension}`);
+      setBackDrop(false);
+    } catch (e) {
+      console.error('Export failed:', e);
+      showError('Export failed');
+      setBackDrop(false);
     }
   };
 
@@ -197,7 +310,7 @@ export default function RightPanel({
           </IconButton>
         </Box>
       )}
-      
+
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         autoHideDuration={5000}
@@ -218,44 +331,42 @@ export default function RightPanel({
         </Alert>
       </Snackbar>
 
-      {/* Tabs */}
       <Tabs
         value={activePanel}
         onChange={handleTabChange}
         className="panel-tabs"
+        variant="scrollable"
+        scrollButtons="auto"
         TabIndicatorProps={{ className: 'tab-indicator' }}
       >
         <Tab label="Adjust" value="adjust" className="panel-tab" />
-        <Tab label="Layers" value="layers" className="panel-tab" />
+        <Tab label="Filters" value="filters" className="panel-tab" />
+        <Tab label="Export" value="export" className="panel-tab" />
         <Tab label="History" value="history" className="panel-tab" />
       </Tabs>
 
-      {/* Adjust Panel */}
       {activePanel === 'adjust' && (
         <Box className="panel-content">
-          {/* Histogram */}
           <Box className="histogram-section">
             <Histogram darkMode={darkMode} />
           </Box>
 
-          {/* Image Info */}
           <Box className="image-info">
             <Box className="info-item">
               <Box className="info-dot green" />
-              <Typography className="info-text">4000 x 6000 px</Typography>
+              <Typography className="info-text">Realtime FE</Typography>
             </Box>
             <Box className="info-divider" />
-            <Typography className="info-text">72 DPI</Typography>
-            <Box className="info-divider" />
-            <Typography className="info-text">16-BIT PRO-PHOTO RGB</Typography>
+            <Typography className="info-text">
+              {isLive ? 'Preview' : 'Committed'}
+            </Typography>
           </Box>
 
-          {/* Undo/Redo Buttons */}
           <Box className="history-controls">
             <Button
               className="history-button"
               startIcon={<UndoIcon />}
-              onClick={onUndo}
+              onClick={handleUndoClick}
               disabled={!canUndo}
               size="small"
             >
@@ -264,7 +375,7 @@ export default function RightPanel({
             <Button
               className="history-button"
               startIcon={<RedoIcon />}
-              onClick={onRedo}
+              onClick={handleRedoClick}
               disabled={!canRedo}
               size="small"
             >
@@ -279,70 +390,35 @@ export default function RightPanel({
             </Button>
           </Box>
 
-          {/* Exposure & Color Section */}
           <Typography className="section-title">EXPOSURE & COLOR</Typography>
+          <Typography className="processing-hint">Live preview · Reset restores original</Typography>
 
-          <Box className="adjustment-row">
-            <Typography className="adjustment-label">Exposure</Typography>
-            <Typography className="adjustment-value">{formatValue(localAdjustments.exposure)}</Typography>
-          </Box>
-          <Slider
-            size="small"
-            min={-100}
-            max={100}
-            step={1}
-            value={localAdjustments.exposure}
-            onChange={(e, v) => handleAdjustmentChange('exposure', v)}
-            className="adjustment-slider"
-          />
+          {['exposure', 'contrast', 'highlights', 'shadows'].map((key) => (
+            <React.Fragment key={key}>
+              <Box className="adjustment-row">
+                <Typography className="adjustment-label">
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </Typography>
+                <Typography className="adjustment-value">
+                  {formatValue(localAdjustments[key])}
+                </Typography>
+              </Box>
+              <Slider
+                size="small"
+                min={-100}
+                max={100}
+                step={1}
+                value={localAdjustments[key]}
+                onChange={(e, v) => handleAdjustmentChange(key, v)}
+                onChangeCommitted={handleAdjustmentCommit}
+                className="adjustment-slider"
+              />
+            </React.Fragment>
+          ))}
 
-          <Box className="adjustment-row">
-            <Typography className="adjustment-label">Contrast</Typography>
-            <Typography className="adjustment-value">{formatValue(localAdjustments.contrast)}</Typography>
-          </Box>
-          <Slider
-            size="small"
-            min={-100}
-            max={100}
-            step={1}
-            value={localAdjustments.contrast}
-            onChange={(e, v) => handleAdjustmentChange('contrast', v)}
-            className="adjustment-slider"
-          />
-
-          <Box className="adjustment-row">
-            <Typography className="adjustment-label">Highlights</Typography>
-            <Typography className="adjustment-value">{formatValue(localAdjustments.highlights)}</Typography>
-          </Box>
-          <Slider
-            size="small"
-            min={-100}
-            max={100}
-            step={1}
-            value={localAdjustments.highlights}
-            onChange={(e, v) => handleAdjustmentChange('highlights', v)}
-            className="adjustment-slider"
-          />
-
-          <Box className="adjustment-row">
-            <Typography className="adjustment-label">Shadows</Typography>
-            <Typography className="adjustment-value">{formatValue(localAdjustments.shadows)}</Typography>
-          </Box>
-          <Slider
-            size="small"
-            min={-100}
-            max={100}
-            step={1}
-            value={localAdjustments.shadows}
-            onChange={(e, v) => handleAdjustmentChange('shadows', v)}
-            className="adjustment-slider"
-          />
-
-          {/* Tone Curve */}
           <Typography className="section-title">TONE CURVE</Typography>
           <ToneCurve darkMode={darkMode} />
 
-          {/* Presets */}
           <Typography className="section-title">PRESETS</Typography>
           <Box className="presets-grid">
             {presets.map((preset) => (
@@ -356,11 +432,15 @@ export default function RightPanel({
               </Button>
             ))}
           </Box>
+        </Box>
+      )}
 
-          {/* Filters Section */}
-          <Typography className="section-title">QUICK FILTERS</Typography>
+      {activePanel === 'filters' && (
+        <Box className="panel-content">
+          <Typography className="section-title">CLICK A FILTER TO APPLY</Typography>
+          <Typography className="processing-hint">Runs instantly on device</Typography>
           <Box className="filters-list">
-            {filters.slice(0, 6).map((filter, index) => (
+            {filters.map((filter, index) => (
               <Box
                 key={index}
                 className="filter-item"
@@ -371,68 +451,74 @@ export default function RightPanel({
               </Box>
             ))}
           </Box>
+        </Box>
+      )}
 
-          {/* All Filters */}
-          <Typography className="section-title">ALL FILTERS</Typography>
-          <Box className="filters-grid">
-            {filters.map((filter, index) => (
-              <Box
-                key={index}
-                className="filter-grid-item"
-                onClick={() => getFilter(filter.filter)}
+      {activePanel === 'export' && (
+        <Box className="panel-content">
+          <Typography className="section-title">FORMAT</Typography>
+          <Typography className="processing-hint">Convert before download</Typography>
+          <Box className="presets-grid">
+            {['jpeg', 'png', 'webp'].map((fmt) => (
+              <Button
+                key={fmt}
+                className={`preset-button ${exportFormat === fmt ? 'preset-active' : ''}`}
+                variant="outlined"
+                onClick={() => setExportFormat?.(fmt)}
               >
-                <img src={filter.image} alt={filter.title} className="filter-grid-thumb" />
-                <Typography className="filter-grid-name">{filter.title}</Typography>
-              </Box>
+                {fmt.toUpperCase()}
+              </Button>
             ))}
           </Box>
 
-          {/* Compression */}
-          <Typography className="section-title">COMPRESSION</Typography>
+          <Typography className="section-title">COMPRESSION / QUALITY</Typography>
           <Box className="compression-section">
-            <Typography className="adjustment-label">
-              Quality: {Math.round(compressionFactor * 100)}%
-            </Typography>
+            <Box className="adjustment-row">
+              <Typography className="adjustment-label">
+                Quality
+              </Typography>
+              <Typography className="adjustment-value">
+                {Math.round(compressionFactor * 100)}%
+              </Typography>
+            </Box>
             <Slider
               value={compressionFactor}
               min={0.1}
               max={1}
-              step={0.1}
+              step={0.05}
               size="small"
+              disabled={exportFormat === 'png'}
               onChange={(e, newValue) => setCompressionFactor(newValue)}
               valueLabelDisplay="auto"
               valueLabelFormat={(value) => `${Math.round(value * 100)}%`}
             />
+            <Typography className="processing-hint">
+              {exportFormat === 'png'
+                ? 'PNG is lossless — quality slider disabled'
+                : 'Lower quality = smaller JPEG/WebP file'}
+            </Typography>
           </Box>
+
+          <Button
+            variant="contained"
+            fullWidth
+            className="export-panel-btn"
+            onClick={handleDownload}
+            disabled={!image}
+            sx={{ mt: 2, borderRadius: 0 }}
+          >
+            Download {exportFormat.toUpperCase()}
+          </Button>
         </Box>
       )}
 
-      {/* Layers Panel */}
-      {activePanel === 'layers' && (
-        <Box className="panel-content">
-          {image ? (
-            <Box className="layers-list">
-              <Box className="layer-item active">
-                <Box className="layer-thumbnail">
-                  <img src={image} alt="Base" />
-                </Box>
-                <Typography className="layer-name">Background</Typography>
-              </Box>
-            </Box>
-          ) : (
-            <Typography className="empty-state">No image loaded</Typography>
-          )}
-        </Box>
-      )}
-
-      {/* History Panel */}
       {activePanel === 'history' && (
         <Box className="panel-content">
           {Actions.length > 0 ? (
             <Box className="history-list">
               {Actions.map((action, index) => (
-                <Box 
-                  key={index} 
+                <Box
+                  key={index}
                   className={`history-item ${index === Actions.length - 1 ? 'active' : ''}`}
                 >
                   <Typography className="history-step">Step {index + 1}</Typography>
@@ -446,8 +532,7 @@ export default function RightPanel({
       )}
     </>
   );
-  
-  // Mobile drawer version
+
   if (isMobile) {
     return (
       <Drawer
@@ -456,15 +541,14 @@ export default function RightPanel({
         onClose={onClose}
         className="right-panel-drawer"
         PaperProps={{
-          className: `right-panel mobile ${darkMode ? 'dark' : 'light'}`
+          className: `right-panel mobile ${darkMode ? 'dark' : 'light'}`,
         }}
       >
         {panelContent}
       </Drawer>
     );
   }
-  
-  // Desktop version
+
   return (
     <Box className={`right-panel ${darkMode ? 'dark' : 'light'}`}>
       {panelContent}

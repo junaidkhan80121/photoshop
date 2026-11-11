@@ -1,69 +1,66 @@
-/* Obsidian Lens Navbar Styles */
+/* Minimal B&W Navbar */
 
 .navbar {
-  background: linear-gradient(180deg, #1a1a24 0%, #13131a 100%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  height: 48px;
-  min-height: 48px !important;
+  background: #0a0a0a !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  height: 44px;
+  min-height: 44px !important;
 }
 
 .light .navbar {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 .navbar-toolbar {
-  min-height: 48px !important;
-  height: 48px;
-  padding: 0 16px !important;
+  min-height: 44px !important;
+  height: 44px;
+  padding: 0 14px !important;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-/* Brand/Logo */
 .navbar-brand {
   display: flex;
   align-items: center;
-  margin-right: 24px;
+  margin-right: 20px;
 }
 
 .navbar-logo {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  background: linear-gradient(135deg, #a78bfa, #f472b6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
   white-space: nowrap;
+  background: none !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .light .navbar-logo {
-  background: linear-gradient(135deg, #7c3aed, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
 }
 
-/* Mobile Menu Button */
 .mobile-menu-btn {
-  color: #94a3b8 !important;
+  color: #a3a3a3 !important;
   margin-right: 8px;
   display: none;
+  border-radius: 0 !important;
 }
 
 .mobile-menu-btn:hover {
-  color: #f8fafc !important;
+  color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
-/* Mobile Drawer */
 .mobile-drawer .MuiDrawer-paper {
-  background-color: #1a1a24 !important;
+  background-color: #0a0a0a !important;
   border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-  width: 280px;
+  width: 260px;
+  border-radius: 0 !important;
 }
 
 .light .mobile-drawer .MuiDrawer-paper {
@@ -75,15 +72,27 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+  padding: 14px 16px;
+  background: #111111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .mobile-drawer-header {
+  background: #f5f5f5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .mobile-drawer-title {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 18px !important;
-  font-weight: 700 !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
   color: #ffffff !important;
+}
+
+.light .mobile-drawer-title {
+  color: #000000 !important;
 }
 
 .mobile-menu-list {
@@ -92,48 +101,46 @@
 
 .mobile-menu-list .MuiListItem-root {
   padding: 12px 16px;
-  color: #f8fafc;
+  color: #ffffff;
 }
 
 .light .mobile-menu-list .MuiListItem-root {
-  color: #0f172a;
+  color: #0a0a0a;
 }
 
 .mobile-menu-list .MuiListItem-root:hover {
-  background-color: rgba(167, 139, 250, 0.1);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
-/* Menu Buttons */
 .navbar-menus {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
 }
 
 .navbar-menu-button {
-  color: #94a3b8 !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
+  color: #a3a3a3 !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   text-transform: capitalize !important;
-  padding: 6px 12px !important;
+  padding: 4px 10px !important;
   min-width: auto !important;
-  border-radius: 6px !important;
-  transition: all 0.15s ease !important;
+  border-radius: 0 !important;
 }
 
 .navbar-menu-button:hover {
-  color: #f8fafc !important;
+  color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .light .navbar-menu-button {
-  color: #64748b !important;
+  color: #525252 !important;
 }
 
 .light .navbar-menu-button:hover {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -142,39 +149,38 @@
   margin-left: -4px !important;
 }
 
-/* Dropdown Menu */
 .dropdown-paper {
-  background-color: #1a1a24 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  background-color: #111111 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
   margin-top: 4px !important;
 }
 
 .light .dropdown-paper {
   background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
 .navbar-dropdown .MuiMenuItem-root {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
-  color: #f8fafc !important;
-  padding: 8px 16px !important;
-  min-height: 36px !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 12px !important;
+  color: #ffffff !important;
+  padding: 8px 14px !important;
+  min-height: 34px !important;
 }
 
 .light .navbar-dropdown .MuiMenuItem-root {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
 }
 
 .navbar-dropdown .MuiMenuItem-root:hover {
-  background-color: rgba(167, 139, 250, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .menu-divider {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
   margin: 4px 0 !important;
 }
 
@@ -182,60 +188,58 @@
   background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Right Actions */
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-left: auto;
 }
 
 .navbar-icon-button {
-  color: #94a3b8 !important;
-  padding: 8px !important;
-  border-radius: 6px !important;
-  transition: all 0.15s ease !important;
+  color: #a3a3a3 !important;
+  padding: 6px !important;
+  border-radius: 0 !important;
 }
 
 .navbar-icon-button:hover {
-  color: #f8fafc !important;
+  color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .light .navbar-icon-button {
-  color: #64748b !important;
+  color: #525252 !important;
 }
 
 .light .navbar-icon-button:hover {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .navbar-action-button {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   text-transform: none !important;
-  padding: 6px 16px !important;
-  border-radius: 6px !important;
-  height: 32px;
+  padding: 4px 12px !important;
+  border-radius: 0 !important;
+  height: 28px;
   white-space: nowrap;
 }
 
 .share-button {
-  color: #f8fafc !important;
+  color: #ffffff !important;
   background-color: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .share-button:hover {
   background-color: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: #ffffff !important;
 }
 
 .light .share-button {
-  color: #0f172a !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #0a0a0a !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 .light .share-button:hover {
@@ -243,139 +247,80 @@
 }
 
 .export-button {
-  background: linear-gradient(135deg, #a78bfa, #8b5cf6) !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
   border: none !important;
-  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3) !important;
+  box-shadow: none !important;
 }
 
 .export-button:hover {
-  background: linear-gradient(135deg, #c4b5fd, #a78bfa) !important;
-  box-shadow: 0 6px 16px rgba(167, 139, 250, 0.4) !important;
-  transform: translateY(-1px);
+  background: #e5e5e5 !important;
+  box-shadow: none !important;
+  transform: none;
 }
 
-/* ============================
-   RESPONSIVE BREAKPOINTS
-   ============================ */
+.light .export-button {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
 
-/* Tablets and below */
+.light .export-button:hover {
+  background: #262626 !important;
+}
+
 @media (max-width: 991px) {
   .navbar {
-    height: 44px;
-    min-height: 44px !important;
+    height: 40px;
+    min-height: 40px !important;
   }
-  
+
   .navbar-toolbar {
-    min-height: 44px !important;
-    height: 44px;
-    padding: 0 12px !important;
+    min-height: 40px !important;
+    height: 40px;
+    padding: 0 10px !important;
   }
-  
+
   .navbar-logo {
-    font-size: 15px !important;
+    font-size: 12px !important;
   }
-  
+
   .navbar-menu-button {
-    padding: 4px 10px !important;
-    font-size: 12px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
   }
-  
+
   .navbar-action-button {
-    padding: 4px 12px !important;
-    font-size: 12px !important;
-    height: 30px;
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    height: 28px;
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .mobile-menu-btn {
     display: flex !important;
   }
-  
+
   .navbar-menus {
     display: none !important;
   }
-  
+
   .navbar-brand {
     margin-right: auto;
     margin-left: 8px;
   }
-  
-  .navbar-logo {
-    font-size: 14px !important;
-  }
-  
-  .navbar-actions {
-    gap: 4px;
-  }
-  
-  .navbar-action-button {
-    padding: 4px 10px !important;
-    font-size: 11px !important;
-  }
-  
-  .export-button .MuiButton-startIcon {
-    margin-right: 4px;
-  }
-}
 
-/* Small mobile */
-@media (max-width: 575px) {
-  .navbar {
-    height: 40px;
-    min-height: 40px !important;
-  }
-  
-  .navbar-toolbar {
-    min-height: 40px !important;
-    height: 40px;
-    padding: 0 8px !important;
-  }
-  
-  .navbar-logo {
-    font-size: 13px !important;
-  }
-  
-  .share-button {
-    display: none !important;
-  }
-  
-  .export-button {
-    padding: 4px 8px !important;
-    font-size: 11px !important;
-  }
-}
-
-/* Very small mobile */
-@media (max-width: 375px) {
   .navbar-logo {
     font-size: 12px !important;
   }
-  
-  .export-button {
-    padding: 4px 6px !important;
+
+  .navbar-actions {
+    gap: 4px;
   }
 }
 
-/* Landscape mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-  .navbar {
-    height: 36px;
-    min-height: 36px !important;
-  }
-  
-  .navbar-toolbar {
-    min-height: 36px !important;
-    height: 36px;
-  }
-  
-  .navbar-logo {
-    font-size: 13px !important;
-  }
-  
-  .mobile-drawer .MuiDrawer-paper {
-    width: 240px;
+@media (max-width: 575px) {
+  .share-button {
+    display: none !important;
   }
 }

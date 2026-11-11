@@ -1,42 +1,33 @@
-/* Obsidian Lens - Professional Photo Editor Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Minimal Black & White Photo Editor */
 
 * {
   box-sizing: border-box;
 }
 
 :root {
-  /* Dark theme colors */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #13131a;
-  --bg-surface: #1a1a24;
-  --bg-surface-hover: #23232e;
-  --bg-elevated: #2a2a3a;
-  
-  /* Accent colors */
-  --accent-purple: #a78bfa;
-  --accent-purple-dark: #8b5cf6;
-  --accent-pink: #f472b6;
-  --accent-blue: #60a5fa;
-  
-  /* Text colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  
-  /* Border colors */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  
-  /* Sizes */
-  --toolbar-width: 64px;
-  --panel-width: 320px;
-  --navbar-height: 48px;
-  --bottom-toolbar-height: 72px;
-  
-  /* Responsive sizes */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-surface: #111111;
+  --bg-surface-hover: #1a1a1a;
+  --bg-elevated: #222222;
+
+  --accent: #ffffff;
+  --accent-muted: #e5e5e5;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.14);
+
+  --toolbar-width: 56px;
+  --panel-width: 300px;
+  --navbar-height: 44px;
+  --bottom-toolbar-height: 56px;
+
   --toolbar-width-mobile: 48px;
-  --panel-width-tablet: 280px;
+  --panel-width-tablet: 260px;
   --panel-width-mobile: 100vw;
 }
 
@@ -45,26 +36,27 @@
   width: 100vw;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
 }
 
 .app-container.light {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-surface: #f1f5f9;
-  --bg-surface-hover: #e2e8f0;
-  --bg-elevated: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --border-default: rgba(0, 0, 0, 0.1);
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-surface: #f5f5f5;
+  --bg-surface-hover: #eeeeee;
+  --bg-elevated: #e5e5e5;
+  --accent: #000000;
+  --accent-muted: #171717;
+  --text-primary: #0a0a0a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-default: rgba(0, 0, 0, 0.14);
 }
 
-/* Main Layout */
 .main-layout {
   display: flex;
   flex: 1;
@@ -72,22 +64,20 @@
   position: relative;
 }
 
-/* Canvas Area */
 .canvas-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: var(--bg-primary);
   position: relative;
-  min-width: 0; /* Prevent flex item from overflowing */
+  min-width: 0;
 }
 
-/* Mobile overlay for side panels */
 .panel-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 100;
 }
 
@@ -95,10 +85,9 @@
   display: block;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -107,83 +96,94 @@
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--text-muted);
-  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
 }
 
-/* Slider Styles */
+/* MUI overrides — flat B&W */
 .MuiSlider-root {
-  color: var(--accent-purple) !important;
+  color: var(--accent) !important;
 }
 
 .MuiSlider-thumb {
-  width: 14px !important;
-  height: 14px !important;
-  background-color: var(--accent-purple) !important;
+  width: 12px !important;
+  height: 12px !important;
+  background-color: var(--accent) !important;
   border: 2px solid var(--bg-surface) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: none !important;
 }
 
-.MuiSlider-thumb:hover {
-  box-shadow: 0 0 0 8px rgba(167, 139, 250, 0.16) !important;
+.MuiSlider-thumb:hover,
+.MuiSlider-thumb.Mui-focusVisible {
+  box-shadow: 0 0 0 6px rgba(128, 128, 128, 0.2) !important;
 }
 
 .MuiSlider-track {
-  height: 4px !important;
-  border-radius: 2px !important;
-  background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink)) !important;
+  height: 2px !important;
+  border-radius: 0 !important;
+  background: var(--accent) !important;
+  border: none !important;
 }
 
 .MuiSlider-rail {
-  height: 4px !important;
-  border-radius: 2px !important;
+  height: 2px !important;
+  border-radius: 0 !important;
   background-color: var(--bg-elevated) !important;
   opacity: 1 !important;
 }
 
-/* Button Styles */
 .MuiButton-root {
   text-transform: none !important;
   font-weight: 500 !important;
-  font-size: 13px !important;
-  border-radius: 6px !important;
-  transition: all 0.15s ease !important;
+  font-size: 12px !important;
+  border-radius: 0 !important;
+  letter-spacing: 0.02em !important;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease !important;
 }
 
 .MuiButton-contained {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark)) !important;
+  background: var(--accent) !important;
+  color: var(--bg-primary) !important;
   box-shadow: none !important;
 }
 
 .MuiButton-contained:hover {
-  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4) !important;
-  transform: translateY(-1px);
+  background: var(--accent-muted) !important;
+  box-shadow: none !important;
+  transform: none;
 }
 
-/* Tooltip Styles */
+.MuiButton-outlined {
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+.MuiButton-outlined:hover {
+  background: var(--bg-surface-hover) !important;
+  border-color: var(--accent) !important;
+}
+
 .MuiTooltip-tooltip {
   background-color: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
-  font-size: 12px !important;
-  padding: 6px 12px !important;
-  border-radius: 6px !important;
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+  border-radius: 0 !important;
   border: 1px solid var(--border-default);
 }
 
-/* Menu Styles */
 .MuiMenu-paper {
   background-color: var(--bg-surface) !important;
   border: 1px solid var(--border-default) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
 }
 
 .MuiMenuItem-root {
-  font-size: 13px !important;
-  padding: 8px 16px !important;
+  font-size: 12px !important;
+  padding: 8px 14px !important;
   color: var(--text-primary) !important;
 }
 
@@ -191,57 +191,48 @@
   background-color: var(--bg-surface-hover) !important;
 }
 
-/* ============================
-   RESPONSIVE BREAKPOINTS
-   ============================ */
-
-/* Large screens (1200px and up) */
 @media (min-width: 1200px) {
   :root {
-    --panel-width: 340px;
+    --panel-width: 320px;
   }
 }
 
-/* Medium screens (992px to 1199px) */
 @media (max-width: 1199px) {
   :root {
-    --panel-width: 300px;
+    --panel-width: 280px;
   }
 }
 
-/* Tablets (768px to 991px) */
 @media (max-width: 991px) {
   :root {
     --panel-width: var(--panel-width-tablet);
-    --toolbar-width: 56px;
+    --toolbar-width: 52px;
   }
-  
+
   .right-panel {
     width: var(--panel-width-tablet) !important;
   }
-  
+
   .left-toolbar {
-    width: 56px !important;
+    width: 52px !important;
   }
-  
+
   .toolbar-button {
-    width: 40px !important;
-    height: 40px !important;
+    width: 36px !important;
+    height: 36px !important;
   }
-  
+
   .panel-content {
     padding: 12px !important;
   }
 }
 
-/* Small tablets and large phones (576px to 767px) */
 @media (max-width: 767px) {
   :root {
-    --navbar-height: 44px;
-    --bottom-toolbar-height: 60px;
+    --navbar-height: 40px;
+    --bottom-toolbar-height: 52px;
   }
-  
-  /* Hide left toolbar on small screens - will show as drawer */
+
   .left-toolbar {
     position: fixed !important;
     left: 0;
@@ -249,14 +240,13 @@
     bottom: var(--bottom-toolbar-height);
     z-index: 200;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
   }
-  
+
   .left-toolbar.mobile-open {
     transform: translateX(0);
   }
-  
-  /* Right panel becomes drawer */
+
   .right-panel {
     position: fixed !important;
     right: 0;
@@ -264,83 +254,77 @@
     bottom: var(--bottom-toolbar-height);
     z-index: 200;
     transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
     width: 85vw !important;
-    max-width: 320px;
+    max-width: 300px;
   }
-  
+
   .right-panel.mobile-open {
     transform: translateX(0);
   }
-  
-  /* Bottom toolbar adjustments */
+
   .bottom-toolbar {
     padding: 0 12px !important;
     gap: 12px !important;
   }
-  
+
   .toolbar-section {
     min-width: 50px !important;
   }
-  
+
   .slider-container {
     width: 80px !important;
   }
-  
+
   .slider-container.small {
     width: 60px !important;
   }
 }
 
-/* Mobile phones (575px and below) */
 @media (max-width: 575px) {
   :root {
     --navbar-height: 40px;
   }
-  
-  /* Navbar adjustments */
+
   .navbar-logo {
-    font-size: 14px !important;
+    font-size: 13px !important;
   }
-  
+
   .navbar-menu-button {
     padding: 4px 8px !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
-  
+
   .navbar-action-button {
     padding: 4px 10px !important;
-    font-size: 12px !important;
+    font-size: 11px !important;
     height: 28px !important;
   }
-  
-  /* Upload zone */
+
   .upload-zone {
     padding: 40px 30px !important;
     margin: 20px;
   }
-  
+
   .upload-title {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
-  
+
   .upload-subtitle {
     font-size: 12px !important;
   }
-  
-  /* Bottom toolbar - hide some elements on very small screens */
+
   .bottom-toolbar {
     height: auto !important;
-    min-height: 56px;
+    min-height: 48px;
     padding: 8px !important;
     flex-wrap: wrap;
   }
-  
+
   .zoom-controls {
     margin-left: auto;
   }
-  
-  /* Crop/Rotate controls */
+
   .crop-controls,
   .rotate-controls {
     position: relative !important;
@@ -350,77 +334,63 @@
     transform: none !important;
     margin: 10px 0;
   }
-  
-  /* Histogram */
+
   .histogram {
     height: 60px !important;
   }
-  
-  /* Filters grid - 2 columns on mobile */
+
   .filters-grid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
-  
-  /* Presets grid - single column */
+
   .presets-grid {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* Very small phones (375px and below) */
 @media (max-width: 375px) {
   .upload-zone {
     padding: 30px 20px !important;
   }
-  
+
   .upload-icon {
     font-size: 36px !important;
   }
-  
+
   .navbar-menus {
-    display: none !important; /* Hide menus on very small screens */
+    display: none !important;
   }
-  
+
   .mobile-menu-button {
     display: flex !important;
   }
 }
 
-/* Landscape orientation on mobile */
 @media (max-height: 500px) and (orientation: landscape) {
   :root {
     --navbar-height: 36px;
-    --bottom-toolbar-height: 48px;
+    --bottom-toolbar-height: 44px;
     --toolbar-width: 44px;
   }
-  
+
   .left-toolbar {
     padding: 8px 0 !important;
   }
-  
+
   .toolbar-button {
-    width: 36px !important;
-    height: 36px !important;
+    width: 32px !important;
+    height: 32px !important;
   }
-  
+
   .toolbar-icon {
     font-size: 16px !important;
   }
-  
+
   .bottom-toolbar {
     padding: 4px 12px !important;
   }
 }
 
-/* High DPI / Retina displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .cropper-container .cropper-point {
-    width: 12px;
-    height: 12px;
-  }
-}
-
-/* Print styles */
 @media print {
   .left-toolbar,
   .right-panel,
@@ -428,7 +398,7 @@
   .navbar {
     display: none !important;
   }
-  
+
   .canvas-area {
     height: 100vh;
   }

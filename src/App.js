@@ -7,6 +7,7 @@ import LeftToolbar from "./LeftToolbar";
 import RightPanel from "./RightPanel";
 import BottomToolbar from "./BottomToolbar";
 import ImageCanvas from "./ImageCanvas";
+import { flipImage, rotateImage, applyFilter } from "./utils/imageProcessing";
 
 function App() {
   const [activeTool, setActiveTool] = useState("select");
@@ -15,9 +16,15 @@ function App() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [backDrop, setBackDrop] = useState(false);
   const [compressionFactor, setCompressionFactor] = useState(0.8);
+  const [exportFormat, setExportFormat] = useState("jpeg");
   const [activePanel, setActivePanel] = useState("adjust");
   const [leftPanelOpen, setLeftPanelOpen] = useState(false);
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  const [zoom, setZoom] = useState(100);
+  const [brushSize, setBrushSize] = useState(24);
+  const [brushColor, setBrushColor] = useState("#ffffff");
+  const [textSize, setTextSize] = useState(48);
+  const [textValue, setTextValue] = useState("Text");
   
   // Adjustment values
   const [adjustments, setAdjustments] = useState({
@@ -71,7 +78,7 @@ function App() {
     }
   }, [history, historyIndex]);
 
-  // Set image with history tracking
+  // Set image with history tracking (initial upload / direct set)
   const handleSetImage = useCallback((newImage) => {
     if (newImage && history.length === 0) {
       setHistory([newImage]);
@@ -79,6 +86,47 @@ function App() {
     }
     setImage(newImage);
   }, [history.length]);
+
+  const handleToolAction = useCallback(async (actionId) => {
+    if (!image) return;
+    try {
+      setBackDrop(true);
+      let result = null;
+      switch (actionId) {
+        case "flipH":
+          result = await flipImage(image, "horizontal");
+          break;
+        case "flipV":
+          result = await flipImage(image, "vertical");
+          break;
+        case "rotate90":
+          result = await rotateImage(image, 90);
+          break;
+        case "invert":
+          result = await applyFilter(image, "negative");
+          break;
+        case "grayscale":
+          result = await applyFilter(image, "grayscale");
+          break;
+        case "blur":
+          result = await applyFilter(image, "blur");
+          break;
+        case "sharpen":
+          result = await applyFilter(image, "sharpen");
+          break;
+        default:
+          break;
+      }
+      if (result) {
+        setImage(result);
+        addToHistory(result);
+      }
+      setBackDrop(false);
+    } catch (e) {
+      console.error("Tool action failed:", e);
+      setBackDrop(false);
+    }
+  }, [image, addToHistory]);
 
   // Toggle left panel (for mobile)
   const toggleLeftPanel = useCallback(() => {
@@ -96,49 +144,49 @@ function App() {
     palette: {
       mode: darkMode ? "dark" : "light",
       primary: {
-        main: darkMode ? "#a78bfa" : "#7c3aed",
-        light: darkMode ? "#c4b5fd" : "#8b5cf6",
-        dark: darkMode ? "#8b5cf6" : "#6d28d9",
-        contrastText: "#ffffff",
+        main: darkMode ? "#ffffff" : "#000000",
+        light: darkMode ? "#e5e5e5" : "#262626",
+        dark: darkMode ? "#a3a3a3" : "#000000",
+        contrastText: darkMode ? "#000000" : "#ffffff",
       },
       secondary: {
-        main: darkMode ? "#f472b6" : "#ec4899",
-        light: darkMode ? "#f9a8d4" : "#f472b6",
-        dark: darkMode ? "#ec4899" : "#db2777",
-        contrastText: "#ffffff",
+        main: darkMode ? "#a3a3a3" : "#525252",
+        light: darkMode ? "#d4d4d4" : "#737373",
+        dark: darkMode ? "#737373" : "#262626",
+        contrastText: darkMode ? "#000000" : "#ffffff",
       },
       background: {
-        default: darkMode ? "#0a0a0f" : "#f8fafc",
-        paper: darkMode ? "#13131a" : "#ffffff",
+        default: darkMode ? "#000000" : "#ffffff",
+        paper: darkMode ? "#0a0a0a" : "#fafafa",
       },
       surface: {
-        main: darkMode ? "#1a1a24" : "#f1f5f9",
-        dark: darkMode ? "#23232e" : "#e2e8f0",
+        main: darkMode ? "#111111" : "#f5f5f5",
+        dark: darkMode ? "#1a1a1a" : "#eeeeee",
       },
       text: {
-        primary: darkMode ? "#f8fafc" : "#0f172a",
-        secondary: darkMode ? "#94a3b8" : "#64748b",
+        primary: darkMode ? "#ffffff" : "#0a0a0a",
+        secondary: darkMode ? "#a3a3a3" : "#525252",
       },
     },
     typography: {
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      h1: { fontWeight: 700, letterSpacing: "-0.02em" },
-      h2: { fontWeight: 700, letterSpacing: "-0.02em" },
-      h3: { fontWeight: 600, letterSpacing: "-0.01em" },
-      h6: { fontWeight: 600, letterSpacing: "-0.01em" },
+      fontFamily: "'IBM Plex Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+      h1: { fontWeight: 600, letterSpacing: "-0.03em" },
+      h2: { fontWeight: 600, letterSpacing: "-0.02em" },
+      h3: { fontWeight: 500, letterSpacing: "-0.01em" },
+      h6: { fontWeight: 500, letterSpacing: "-0.01em" },
       body1: { fontWeight: 400, letterSpacing: "0" },
-      body2: { fontWeight: 400, fontSize: "13px" },
-      caption: { fontWeight: 500, fontSize: "11px", letterSpacing: "0.02em" },
+      body2: { fontWeight: 400, fontSize: "12px" },
+      caption: { fontWeight: 500, fontSize: "10px", letterSpacing: "0.06em" },
     },
     shape: {
-      borderRadius: 8,
+      borderRadius: 0,
     },
     components: {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
             scrollBehavior: "smooth",
-            backgroundColor: darkMode ? "#0a0a0f" : "#f8fafc",
+            backgroundColor: darkMode ? "#000000" : "#ffffff",
           },
         },
       },
@@ -192,6 +240,12 @@ function App() {
           onRedo={handleRedo}
           canUndo={historyIndex > 0}
           canRedo={historyIndex < history.length - 1}
+          compressionFactor={compressionFactor}
+          exportFormat={exportFormat}
+          onOpenExport={() => {
+            setActivePanel("export");
+            setRightPanelOpen(true);
+          }}
         />
         <div className="main-layout">
           {/* Overlay for mobile panels */}
@@ -211,6 +265,7 @@ function App() {
             darkMode={darkMode}
             isOpen={leftPanelOpen}
             onClose={() => setLeftPanelOpen(false)}
+            onAction={handleToolAction}
           />
           <div className="canvas-area">
             <ImageCanvas 
@@ -222,10 +277,26 @@ function App() {
               backDrop={backDrop}
               activeTool={activeTool}
               darkMode={darkMode}
+              zoom={zoom}
+              brushSize={brushSize}
+              brushColor={brushColor}
+              setBrushColor={setBrushColor}
+              textSize={textSize}
+              textValue={textValue}
             />
             <BottomToolbar 
               darkMode={darkMode}
               activeTool={activeTool}
+              zoom={zoom}
+              setZoom={setZoom}
+              brushSize={brushSize}
+              setBrushSize={setBrushSize}
+              brushColor={brushColor}
+              setBrushColor={setBrushColor}
+              textSize={textSize}
+              setTextSize={setTextSize}
+              textValue={textValue}
+              setTextValue={setTextValue}
             />
           </div>
           <RightPanel 
@@ -241,6 +312,8 @@ function App() {
             setBackDrop={setBackDrop}
             compressionFactor={compressionFactor}
             setCompressionFactor={setCompressionFactor}
+            exportFormat={exportFormat}
+            setExportFormat={setExportFormat}
             canUndo={historyIndex > 0}
             canRedo={historyIndex < history.length - 1}
             onUndo={handleUndo}

@@ -27,9 +27,24 @@ import {
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
 } from '@mui/icons-material';
+import { exportImage, downloadDataUrl } from '../utils/imageProcessing';
 import './navbar.css';
 
-export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggleLeftPanel, onToggleRightPanel, onUndo, onRedo, canUndo, canRedo }) {
+export default function NavBar({
+  darkMode,
+  setDarkMode,
+  image,
+  setImage,
+  onToggleLeftPanel,
+  onToggleRightPanel,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
+  compressionFactor = 0.8,
+  exportFormat = 'jpeg',
+  onOpenExport,
+}) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -65,12 +80,21 @@ export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggl
     setMobileMenuOpen(false);
   };
 
-  const handleExport = () => {
-    if (image) {
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = 'edited-image.png';
-      link.click();
+  const handleExport = async () => {
+    if (!image) {
+      onOpenExport?.();
+      handleMenuClose('file');
+      setMobileMenuOpen(false);
+      return;
+    }
+    try {
+      const { dataUrl, extension } = await exportImage(image, {
+        format: exportFormat,
+        quality: compressionFactor,
+      });
+      downloadDataUrl(dataUrl, `edited-image.${extension}`);
+    } catch (e) {
+      console.error('Export failed:', e);
     }
     handleMenuClose('file');
     setMobileMenuOpen(false);
@@ -84,15 +108,6 @@ export default function NavBar({ darkMode, setDarkMode, image, setImage, onToggl
     filter: ['Last Filter', 'Convert for Smart Filters', 'Filter Gallery', 'Lens Correction'],
     view: ['Fit on Screen', 'Actual Pixels', 'Zoom In', 'Zoom Out', 'Rulers', 'Grid'],
   };
-
-  const mobileMenuItems = [
-    { label: 'File', hasSubmenu: true },
-    { label: 'Edit', hasSubmenu: true },
-    { label: 'Image', hasSubmenu: true },
-    { label: 'Layer', hasSubmenu: true },
-    { label: 'Filter', hasSubmenu: true },
-    { label: 'View', hasSubmenu: true },
-  ];
 
   return (
     <AppBar position="static" className="navbar" elevation={0}>

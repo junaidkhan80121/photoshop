@@ -1,13 +1,8 @@
-// API configuration loaded only from environment variables.
-const API_BASE_URL = process.env.REACT_APP_API_URL?.trim();
+// Optional API base — most edits now run on the client for realtime feel.
+// Backend remains available for heavier server-only ops if configured.
+const API_BASE_URL = process.env.REACT_APP_API_URL?.trim() || '';
 
-if (!API_BASE_URL) {
-  throw new Error(
-    'Missing REACT_APP_API_URL. Define it in frontend .env or your deployment environment.'
-  );
-}
-
-const buildUrl = (path) => `${API_BASE_URL}${path}`;
+const buildUrl = (path) => (API_BASE_URL ? `${API_BASE_URL}${path}` : '');
 
 export const API_ENDPOINTS = {
   ADJUST: buildUrl('/adjust'),
@@ -16,5 +11,7 @@ export const API_ENDPOINTS = {
   ROTATE: buildUrl('/rotate'),
   FLIP: buildUrl('/flip'),
 };
+
+export const hasApi = Boolean(API_BASE_URL);
 
 export default API_BASE_URL;

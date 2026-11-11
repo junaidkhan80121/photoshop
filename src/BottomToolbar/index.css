@@ -1,32 +1,32 @@
-/* Bottom Toolbar Styles */
+/* Minimal B&W Bottom Toolbar */
 
 .bottom-toolbar {
-  height: 72px;
-  background: linear-gradient(180deg, #1a1a24 0%, #13131a 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  height: 56px;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 20px;
+  padding: 0 20px;
+  gap: 16px;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .bottom-toolbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .bottom-toolbar.light {
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fafafa;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .toolbar-section {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 60px;
+  min-width: 56px;
   flex-shrink: 0;
 }
 
@@ -38,103 +38,105 @@
 
 .section-icon {
   font-size: 14px !important;
-  color: #a78bfa !important;
+  color: #ffffff !important;
 }
 
 .light .section-icon {
-  color: #7c3aed !important;
+  color: #000000 !important;
 }
 
 .section-label {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 10px !important;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 9px !important;
   font-weight: 600 !important;
-  color: #64748b !important;
-  letter-spacing: 0.08em !important;
+  color: #737373 !important;
+  letter-spacing: 0.1em !important;
 }
 
 .section-value {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #f8fafc !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
 }
 
 .light .section-value {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
 }
 
 .slider-container {
-  width: 120px;
+  width: 110px;
   flex-shrink: 0;
 }
 
 .slider-container.small {
-  width: 100px;
+  width: 90px;
 }
 
 .toolbar-slider {
-  color: #a78bfa !important;
+  color: #ffffff !important;
+}
+
+.light .toolbar-slider {
+  color: #000000 !important;
 }
 
 .toolbar-slider .MuiSlider-thumb {
-  width: 12px !important;
-  height: 12px !important;
+  width: 10px !important;
+  height: 10px !important;
 }
 
 .toolbar-slider .MuiSlider-track {
-  height: 3px !important;
+  height: 2px !important;
 }
 
 .toolbar-slider .MuiSlider-rail {
-  height: 3px !important;
+  height: 2px !important;
 }
 
 .toolbar-divider {
   width: 1px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.06);
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
 
 .light .toolbar-divider {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Color Picker */
 .color-picker {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: outline 0.12s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
 }
 
 .color-swatch:hover {
-  transform: scale(1.1);
+  outline: 1px solid #ffffff;
+  outline-offset: 2px;
 }
 
 .color-swatch.active {
-  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.4);
+  outline: 1px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .color-swatch.active::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid #a78bfa;
+  display: none;
 }
 
-/* Placeholder */
 .toolbar-placeholder {
   flex: 1;
   display: flex;
@@ -144,186 +146,72 @@
 }
 
 .placeholder-text {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 14px !important;
-  color: #64748b !important;
-  font-style: italic;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  font-size: 12px !important;
+  color: #737373 !important;
+  font-style: normal;
+  letter-spacing: 0.04em;
 }
 
-/* Zoom Controls */
 .zoom-controls {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
-  padding: 4px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 6px;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
 
 .light .zoom-controls {
-  background-color: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.06);
+  background-color: transparent;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .zoom-button {
-  color: #64748b !important;
+  color: #737373 !important;
   padding: 4px !important;
+  border-radius: 0 !important;
 }
 
 .zoom-button:hover {
-  color: #f8fafc !important;
+  color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 .light .zoom-button:hover {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
   background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .zoom-value {
-  font-family: 'Inter', sans-serif !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #f8fafc !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
   min-width: 40px;
   text-align: center;
 }
 
 .light .zoom-value {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
 }
 
-/* ============================
-   RESPONSIVE BREAKPOINTS
-   ============================ */
-
-/* Tablets */
-@media (max-width: 991px) {
-  .bottom-toolbar {
-    height: 64px;
-    padding: 0 16px;
-    gap: 16px;
-  }
-  
-  .slider-container {
-    width: 100px;
-  }
-  
-  .slider-container.small {
-    width: 80px;
-  }
-  
-  .section-value {
-    font-size: 13px !important;
-  }
-}
-
-/* Mobile */
 @media (max-width: 767px) {
   .bottom-toolbar {
-    height: 56px;
+    height: 52px;
     padding: 0 12px;
     gap: 12px;
   }
-  
-  .toolbar-section {
-    min-width: 50px;
-  }
-  
-  .section-label {
-    font-size: 9px !important;
-  }
-  
-  .section-value {
-    font-size: 12px !important;
-  }
-  
-  .slider-container {
-    width: 80px;
-  }
-  
+
   .slider-container.small {
     width: 60px;
   }
-  
-  .color-picker {
-    gap: 8px;
-  }
-  
+
   .color-swatch {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .toolbar-divider {
-    height: 32px;
-  }
-  
-  .placeholder-text {
-    font-size: 12px !important;
-  }
-}
-
-/* Small mobile */
-@media (max-width: 575px) {
-  .bottom-toolbar {
-    height: auto;
-    min-height: 52px;
-    padding: 8px 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .toolbar-section:nth-child(3),
-  .toolbar-section:nth-child(4) {
-    display: none; /* Hide some sections on very small screens */
-  }
-  
-  .zoom-controls {
-    margin-left: auto;
-  }
-  
-  .zoom-value {
-    font-size: 11px !important;
-    min-width: 32px;
-  }
-}
-
-/* Very small mobile */
-@media (max-width: 375px) {
-  .bottom-toolbar {
-    padding: 6px 8px;
-  }
-  
-  .section-label {
-    font-size: 8px !important;
-  }
-  
-  .section-value {
-    font-size: 11px !important;
-  }
-}
-
-/* Landscape mobile */
-@media (max-height: 500px) and (orientation: landscape) {
-  .bottom-toolbar {
-    height: 48px;
-    padding: 4px 12px;
-  }
-  
-  .toolbar-section {
-    min-width: 45px;
-  }
-  
-  .slider-container {
-    width: 70px;
-  }
-  
-  .color-swatch {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 }

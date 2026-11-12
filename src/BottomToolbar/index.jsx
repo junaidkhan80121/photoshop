@@ -6,6 +6,8 @@ import {
   Brush as BrushIcon,
   Opacity as OpacityIcon,
   Title as TextIcon,
+  GridOn as GridOnIcon,
+  GridOff as GridOffIcon,
 } from '@mui/icons-material';
 import './index.css';
 
@@ -19,7 +21,7 @@ const colors = [
 ];
 
 const TOOL_HINTS = {
-  select: 'Select — use ±90° to rotate',
+  select: 'Select — ±1° / ±90° rotate · use Grid to align',
   crop: 'Crop — drag box, then Apply Crop',
   brush: 'Brush — paint, then Apply Brush',
   eraser: 'Eraser — erase, then Apply Erase',
@@ -49,6 +51,8 @@ export default function BottomToolbar({
   setTextSize,
   textValue,
   setTextValue,
+  showGrid = false,
+  setShowGrid,
 }) {
   const showColor = COLOR_TOOLS.has(activeTool);
   const showSize = SIZE_TOOLS.has(activeTool);
@@ -172,6 +176,16 @@ export default function BottomToolbar({
           </Typography>
         </Box>
       )}
+
+      <Tooltip title={showGrid ? 'Hide alignment grid (Alt+G)' : 'Show alignment grid (Alt+G)'}>
+        <IconButton
+          className={`zoom-button ${showGrid ? 'grid-active' : ''}`}
+          size="small"
+          onClick={() => setShowGrid?.(!showGrid)}
+        >
+          {showGrid ? <GridOnIcon fontSize="small" /> : <GridOffIcon fontSize="small" />}
+        </IconButton>
+      </Tooltip>
 
       <Box className="zoom-controls">
         <IconButton

@@ -309,6 +309,31 @@
   color: #ffffff !important;
 }
 
+.resize-input {
+  width: 96px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 0;
+  outline: none;
+}
+
+.resize-input:focus {
+  border-color: #ffffff;
+}
+
+.light .resize-input {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #0a0a0a;
+}
+
+.light .resize-input:focus {
+  border-color: #000000;
+}
+
 .light .preset-button {
   border-color: rgba(0, 0, 0, 0.14) !important;
   color: #525252 !important;

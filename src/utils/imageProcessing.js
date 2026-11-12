@@ -482,6 +482,108 @@ export async function flipImage(src, mode = 'horizontal', quality = 0.92) {
   return toDataURL(canvas, quality);
 }
 
+export async function getImageSize(src) {
+  const img = await loadImage(src);
+  return { width: img.naturalWidth || img.width, height: img.naturalHeight || img.height };
+}
+
+/**
+ * Resize image. Pass only width or height to keep aspect if lockAspect is true.
+ */
+export async function resizeImage(src, { width, height, lockAspect = true }, quality = 0.92) {
+  const img = await loadImage(src);
+  let w = Math.max(1, Math.round(width || 0));
+  let h = Math.max(1, Math.round(height || 0));
+
+  if (lockAspect) {
+    const aspect = img.width / img.height;
+    if (width && !height) {
+      h = Math.max(1, Math.round(width / aspect));
+    } else if (height && !width) {
+      w = Math.max(1, Math.round(height * aspect));
+    } else if (width && height) {
+      // Fit inside box while keeping aspect
+      if (width / height > aspect) {
+        w = Math.max(1, Math.round(height * aspect));
+        h = height;
+      } else {
+        w = width;
+        h = Math.max(1, Math.round(width / aspect));
+      }
+    } else {
+      w = img.width;
+      h = img.height;
+    }
+  } else {
+    w = width || img.width;
+    h = height || img.height;
+  }
+
+  const { canvas, ctx } = getCanvasContext(w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+  return toDataURL(canvas, quality);
+}
+
+/** Build a 256-entry LUT from curve control points in 0–1 space */
+export function buildCurveLut(points) {
+  const pts = [...points]
+    .map((p) => ({ x: clamp(p.x, 0, 1), y: clamp(p.y, 0, 1) }))
+    .sort((a, b) => a.x - b.x);
+
+  if (pts.length < 2) {
+    pts.length = 0;
+    pts.push({ x: 0, y: 0 }, { x: 1, y: 1 });
+  }
+
+  const lut = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    let y = t;
+    if (t <= pts[0].x) {
+      y = pts[0].y;
+    } else if (t >= pts[pts.length - 1].x) {
+      y = pts[pts.length - 1].y;
+    } else {
+      for (let j = 0; j < pts.length - 1; j++) {
+        const a = pts[j];
+        const b = pts[j + 1];
+        if (t >= a.x && t <= b.x) {
+          const u = b.x === a.x ? 0 : (t - a.x) / (b.x - a.x);
+          y = a.y + (b.y - a.y) * u;
+          break;
+        }
+      }
+    }
+    lut[i] = clamp(Math.round(y * 255));
+  }
+  return lut;
+}
+
+export async function applyToneCurve(src, points, opts = {}) {
+  const { preview = false, maxSide = preview ? 900 : null, quality = preview ? 0.75 : 0.92 } = opts;
+  const { canvas, ctx } = await drawToCanvas(src, maxSide);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const lut = buildCurveLut(points);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = lut[data[i]];
+    data[i + 1] = lut[data[i + 1]];
+    data[i + 2] = lut[data[i + 2]];
+  }
+  ctx.putImageData(imageData, 0, 0);
+  return toDataURL(canvas, quality);
+}
+
+export const DEFAULT_CURVE_POINTS = [
+  { x: 0, y: 0 },
+  { x: 0.25, y: 0.25 },
+  { x: 0.5, y: 0.5 },
+  { x: 0.75, y: 0.75 },
+  { x: 1, y: 1 },
+];
+
 /** Filters that run fully on the client */
 export const CLIENT_FILTERS = new Set([
   'grayscale',

@@ -153,6 +153,16 @@
   letter-spacing: 0.04em;
 }
 
+.zoom-button.grid-active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.light .zoom-button.grid-active {
+  color: #000000 !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
 .zoom-controls {
   margin-left: auto;
   display: flex;

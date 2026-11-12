@@ -24,11 +24,24 @@ import ToneCurve from './ToneCurve';
 import {
   applyAdjustments,
   applyFilter,
+  applyToneCurve,
   CLIENT_FILTERS,
   exportImage,
   downloadDataUrl,
+  getImageSize,
+  resizeImage,
+  DEFAULT_CURVE_POINTS,
 } from '../utils/imageProcessing';
 import './index.css';
+
+function historyLabel(entry, index) {
+  if (typeof entry === 'string') return `Step ${index + 1}`;
+  return entry?.label || `Step ${index + 1}`;
+}
+
+function historyThumb(entry) {
+  return typeof entry === 'string' ? entry : entry?.image;
+}
 
 const filters = [
   { title: 'GrayScale', filter: 'grayscale', image: './filter_preview/grayscale.png' },
@@ -66,6 +79,8 @@ export default function RightPanel({
   setImage,
   setActions,
   Actions,
+  historyIndex = -1,
+  onJumpHistory,
   setBackDrop,
   compressionFactor,
   setCompressionFactor,
@@ -77,6 +92,9 @@ export default function RightPanel({
   onRedo,
   isOpen,
   onClose,
+  fineRotate = 0,
+  setFineRotate,
+  onApplyFineRotate,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -84,6 +102,13 @@ export default function RightPanel({
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [localAdjustments, setLocalAdjustments] = useState(ZERO);
   const [isLive, setIsLive] = useState(false);
+  const [curvePoints, setCurvePoints] = useState(DEFAULT_CURVE_POINTS.map((p) => ({ ...p })));
+  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
+  const [resizeW, setResizeW] = useState('');
+  const [resizeH, setResizeH] = useState('');
+  const [lockAspect, setLockAspect] = useState(true);
+  const aspectRef = useRef(1);
+  const curveBaseRef = useRef(null);
 
   // Unadjusted source for the current slider session — never overwritten by commits
   const sessionBaseRef = useRef(null);
@@ -104,7 +129,6 @@ export default function RightPanel({
   }, [setAdjustments]);
 
   // Adopt external image changes (upload / undo / redo / crop) as a new session base.
-  // Only react to `image` — owned panel updates keep the same session base + slider values.
   useEffect(() => {
     if (ownedUpdateRef.current) {
       ownedUpdateRef.current = false;
@@ -112,17 +136,26 @@ export default function RightPanel({
     }
     if (!image) {
       sessionBaseRef.current = null;
+      curveBaseRef.current = null;
       setLocalAdjustments(ZERO);
       adjustmentsRef.current = ZERO;
       setIsLive(false);
+      setImgSize({ width: 0, height: 0 });
       return;
     }
     sessionBaseRef.current = image;
+    curveBaseRef.current = image;
     setLocalAdjustments(ZERO);
     adjustmentsRef.current = ZERO;
     Object.keys(ZERO).forEach((k) => setAdjustments(k, 0));
+    setCurvePoints(DEFAULT_CURVE_POINTS.map((p) => ({ ...p })));
     setIsLive(false);
-    // Intentionally only [image]: setAdjustments identity must not reset the session
+    getImageSize(image).then((size) => {
+      setImgSize(size);
+      setResizeW(String(size.width));
+      setResizeH(String(size.height));
+      aspectRef.current = size.width / Math.max(size.height, 1);
+    }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image]);
 
@@ -183,7 +216,8 @@ export default function RightPanel({
       // Keep session base + slider values; only refresh the displayed/history image
       const result = await applyAdjustments(source, next, { preview: false });
       setOwnedImage(result);
-      setActions(result);
+      setActions(result, 'Adjust');
+      curveBaseRef.current = result;
       setIsLive(false);
       setBackDrop(false);
     } catch (e) {
@@ -234,7 +268,8 @@ export default function RightPanel({
       sessionBaseRef.current = result;
       clearSliderValues();
       setOwnedImage(result);
-      setActions(result);
+      setActions(result, filterName.replace(/_/g, ' '));
+      curveBaseRef.current = result;
       setIsLive(false);
       setBackDrop(false);
     } catch (e) {
@@ -269,7 +304,102 @@ export default function RightPanel({
     setIsLive(false);
     if (!source) return;
     setOwnedImage(source);
-    setActions(source);
+    setActions(source, 'Reset Adjust');
+  };
+
+  const curvePreviewRaf = useRef(null);
+  const handleCurveChange = (pts) => {
+    setCurvePoints(pts);
+    const base = curveBaseRef.current || sessionBaseRef.current || image;
+    if (!base) return;
+    if (curvePreviewRaf.current) cancelAnimationFrame(curvePreviewRaf.current);
+    curvePreviewRaf.current = requestAnimationFrame(async () => {
+      try {
+        const preview = await applyToneCurve(base, pts, { preview: true });
+        setOwnedImage(preview);
+        setIsLive(true);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  };
+
+  const handleCurveCommit = async (pts) => {
+    const base = curveBaseRef.current || sessionBaseRef.current || image;
+    if (!base) return;
+    try {
+      setBackDrop(true);
+      const result = await applyToneCurve(base, pts, { preview: false });
+      setOwnedImage(result);
+      setActions(result, 'Tone Curve');
+      // Keep curveBase as pre-curve so further drags stay relative;
+      // bake into session when user wants — for stacked edits, update base:
+      curveBaseRef.current = result;
+      sessionBaseRef.current = result;
+      setCurvePoints(DEFAULT_CURVE_POINTS.map((p) => ({ ...p })));
+      setIsLive(false);
+      setBackDrop(false);
+    } catch (e) {
+      console.error(e);
+      setBackDrop(false);
+    }
+  };
+
+  const handleCurveReset = async (pts) => {
+    setCurvePoints(pts);
+    const base = curveBaseRef.current || sessionBaseRef.current;
+    if (base) {
+      setOwnedImage(base);
+      setIsLive(false);
+    }
+  };
+
+  const onResizeWidth = (val) => {
+    setResizeW(val);
+    if (lockAspect && val) {
+      const w = parseInt(val, 10);
+      if (!Number.isNaN(w)) {
+        setResizeH(String(Math.max(1, Math.round(w / aspectRef.current))));
+      }
+    }
+  };
+
+  const onResizeHeight = (val) => {
+    setResizeH(val);
+    if (lockAspect && val) {
+      const h = parseInt(val, 10);
+      if (!Number.isNaN(h)) {
+        setResizeW(String(Math.max(1, Math.round(h * aspectRef.current))));
+      }
+    }
+  };
+
+  const handleResize = async () => {
+    if (!image) {
+      showError('Please upload an image first');
+      return;
+    }
+    const w = parseInt(resizeW, 10);
+    const h = parseInt(resizeH, 10);
+    if (!w || !h) {
+      showError('Enter valid width and height');
+      return;
+    }
+    try {
+      setBackDrop(true);
+      const result = await resizeImage(image, { width: w, height: h, lockAspect: false });
+      setOwnedImage(result);
+      setActions(result, `Resize ${w}×${h}`);
+      sessionBaseRef.current = result;
+      curveBaseRef.current = result;
+      setImgSize({ width: w, height: h });
+      aspectRef.current = w / h;
+      setBackDrop(false);
+    } catch (e) {
+      console.error(e);
+      showError('Resize failed');
+      setBackDrop(false);
+    }
   };
 
   const handleUndoClick = () => {
@@ -340,6 +470,7 @@ export default function RightPanel({
         TabIndicatorProps={{ className: 'tab-indicator' }}
       >
         <Tab label="Adjust" value="adjust" className="panel-tab" />
+        <Tab label="Transform" value="transform" className="panel-tab" />
         <Tab label="Filters" value="filters" className="panel-tab" />
         <Tab label="Export" value="export" className="panel-tab" />
         <Tab label="History" value="history" className="panel-tab" />
@@ -417,7 +548,14 @@ export default function RightPanel({
           ))}
 
           <Typography className="section-title">TONE CURVE</Typography>
-          <ToneCurve darkMode={darkMode} />
+          <Typography className="processing-hint">Drag points · applies on release</Typography>
+          <ToneCurve
+            darkMode={darkMode}
+            points={curvePoints}
+            onChange={handleCurveChange}
+            onCommit={handleCurveCommit}
+            onReset={handleCurveReset}
+          />
 
           <Typography className="section-title">PRESETS</Typography>
           <Box className="presets-grid">
@@ -432,6 +570,107 @@ export default function RightPanel({
               </Button>
             ))}
           </Box>
+        </Box>
+      )}
+
+      {activePanel === 'transform' && (
+        <Box className="panel-content">
+          <Typography className="section-title">IMAGE SIZE</Typography>
+          <Typography className="processing-hint">
+            {imgSize.width ? `${imgSize.width} × ${imgSize.height} px` : 'No image'}
+          </Typography>
+
+          <Box className="adjustment-row">
+            <Typography className="adjustment-label">Width</Typography>
+            <input
+              className="resize-input"
+              type="number"
+              min="1"
+              value={resizeW}
+              onChange={(e) => onResizeWidth(e.target.value)}
+            />
+          </Box>
+          <Box className="adjustment-row" style={{ marginTop: 8 }}>
+            <Typography className="adjustment-label">Height</Typography>
+            <input
+              className="resize-input"
+              type="number"
+              min="1"
+              value={resizeH}
+              onChange={(e) => onResizeHeight(e.target.value)}
+            />
+          </Box>
+          <Box className="adjustment-row" style={{ marginTop: 10 }}>
+            <Typography className="adjustment-label">Lock aspect</Typography>
+            <Button
+              size="small"
+              className={`preset-button ${lockAspect ? 'preset-active' : ''}`}
+              onClick={() => setLockAspect((v) => !v)}
+            >
+              {lockAspect ? 'ON' : 'OFF'}
+            </Button>
+          </Box>
+          <Button
+            variant="contained"
+            fullWidth
+            className="export-panel-btn"
+            onClick={handleResize}
+            disabled={!image}
+            sx={{ mt: 2, borderRadius: 0 }}
+          >
+            Apply Resize
+          </Button>
+
+          <Typography className="section-title">FINE ROTATE</Typography>
+          <Typography className="processing-hint">1° steps · straighten horizons</Typography>
+          <Box className="adjustment-row">
+            <Typography className="adjustment-label">Angle</Typography>
+            <Typography className="adjustment-value">
+              {fineRotate > 0 ? `+${fineRotate}` : fineRotate}°
+            </Typography>
+          </Box>
+          <Slider
+            size="small"
+            min={-45}
+            max={45}
+            step={1}
+            value={fineRotate}
+            onChange={(e, v) => setFineRotate?.(v)}
+            className="adjustment-slider"
+          />
+          <Box className="history-controls">
+            <Button
+              className="history-button"
+              size="small"
+              onClick={() => setFineRotate?.((fineRotate || 0) - 1)}
+            >
+              −1°
+            </Button>
+            <Button
+              className="history-button"
+              size="small"
+              onClick={() => setFineRotate?.((fineRotate || 0) + 1)}
+            >
+              +1°
+            </Button>
+            <Button
+              className="reset-button"
+              size="small"
+              onClick={() => setFineRotate?.(0)}
+            >
+              0°
+            </Button>
+          </Box>
+          <Button
+            variant="contained"
+            fullWidth
+            className="export-panel-btn"
+            disabled={!image || !fineRotate}
+            onClick={() => onApplyFineRotate?.(fineRotate)}
+            sx={{ mt: 1, borderRadius: 0 }}
+          >
+            Apply Rotate {fineRotate ? `${fineRotate > 0 ? '+' : ''}${fineRotate}°` : ''}
+          </Button>
         </Box>
       )}
 
@@ -519,9 +758,18 @@ export default function RightPanel({
               {Actions.map((action, index) => (
                 <Box
                   key={index}
-                  className={`history-item ${index === Actions.length - 1 ? 'active' : ''}`}
+                  className={`history-item ${index === historyIndex ? 'active' : ''}`}
+                  onClick={() => onJumpHistory?.(index)}
                 >
-                  <Typography className="history-step">Step {index + 1}</Typography>
+                  <Box className="layer-thumbnail">
+                    <img src={historyThumb(action)} alt="" />
+                  </Box>
+                  <Box>
+                    <Typography className="history-step">{historyLabel(action, index)}</Typography>
+                    <Typography className="processing-hint" style={{ margin: 0 }}>
+                      #{index + 1}
+                    </Typography>
+                  </Box>
                 </Box>
               ))}
             </Box>

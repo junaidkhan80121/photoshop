@@ -71,6 +71,10 @@ export default function ImageCanvas({
   setBrushColor,
   textSize = 48,
   textValue = 'Text',
+  showGrid = false,
+  fineRotate = 0,
+  setFineRotate,
+  onCommitRotate,
 }) {
   const [dragActive, setDragActive] = useState(false);
   const cropperRef = useRef(null);
@@ -311,8 +315,17 @@ export default function ImageCanvas({
     const canvas = paintRef.current;
     if (!canvas) return;
     const result = canvas.toDataURL('image/png');
+    const labels = {
+      brush: 'Brush',
+      eraser: 'Eraser',
+      text: 'Text',
+      fill: 'Fill',
+      rect: 'Rectangle',
+      line: 'Line',
+      circle: 'Ellipse',
+    };
     setImage(result);
-    setActions(result);
+    setActions(result, labels[activeTool] || 'Draw');
   };
 
   const handleCrop = async () => {
@@ -330,7 +343,7 @@ export default function ImageCanvas({
         height: Math.round(data.height),
       });
       setImage(result);
-      setActions(result);
+      setActions(result, 'Crop');
       cropper.clear();
       setBackDrop(false);
     } catch (e) {
@@ -346,7 +359,8 @@ export default function ImageCanvas({
       setBackDrop(true);
       const result = await rotateImage(image, angle);
       setImage(result);
-      setActions(result);
+      setActions(result, `Rotate ${angle > 0 ? '+' : ''}${angle}°`);
+      setFineRotate?.(0);
       setBackDrop(false);
     } catch (e) {
       console.error('Error rotating image:', e);
@@ -441,6 +455,22 @@ export default function ImageCanvas({
               <Button
                 variant="outlined"
                 size="small"
+                onClick={() => setFineRotate?.((fineRotate || 0) - 1)}
+                className="rotate-btn"
+              >
+                −1°
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setFineRotate?.((fineRotate || 0) + 1)}
+                className="rotate-btn"
+              >
+                +1°
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
                 onClick={() => handleRotate(-90)}
                 className="rotate-btn"
               >
@@ -454,8 +484,20 @@ export default function ImageCanvas({
               >
                 +90°
               </Button>
+              {!!fineRotate && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => onCommitRotate?.(fineRotate)}
+                  className="crop-apply-btn"
+                >
+                  Apply {fineRotate > 0 ? '+' : ''}{fineRotate}°
+                </Button>
+              )}
             </Box>
           )}
+
+          {showGrid && <Box className="align-grid" aria-hidden />}
 
           {isDrawTool && applyLabel() && (
             <Box className="crop-controls">
@@ -471,7 +513,10 @@ export default function ImageCanvas({
           )}
 
           {isDrawTool ? (
-            <Box className="paint-stage" style={{ transform: `scale(${zoomRatio})` }}>
+            <Box
+              className="paint-stage"
+              style={{ transform: `scale(${zoomRatio}) rotate(${fineRotate || 0}deg)` }}
+            >
               <canvas
                 ref={paintRef}
                 className="paint-canvas"
@@ -482,7 +527,11 @@ export default function ImageCanvas({
               />
             </Box>
           ) : (
-            <Box className="cropper-container" onClick={handleCanvasClick}>
+            <Box
+              className="cropper-container"
+              onClick={handleCanvasClick}
+              style={{ transform: fineRotate ? `rotate(${fineRotate}deg)` : undefined }}
+            >
               <Cropper
                 src={image}
                 style={{
